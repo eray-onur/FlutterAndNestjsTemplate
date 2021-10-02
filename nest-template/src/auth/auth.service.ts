@@ -37,12 +37,11 @@ export class AuthService {
       if (foundUser) {
         if(foundUser.password !== signinUserDto.password)
           throw new Error(`Invalid password.`);
-        return {
+        else return {
           access_token: this.jwtService.sign({foundUser}),
         }
-      } else {
-        throw new Error(`Login failed for user ${signinUserDto.username}.`);
       }
+      throw new Error(`Login failed for user ${signinUserDto.username}.`);
     } catch (ex) {
       console.log(ex.statusCode);
       return {

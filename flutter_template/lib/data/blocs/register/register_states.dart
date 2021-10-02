@@ -6,9 +6,9 @@ class UserIsRegisteringState extends RegisterState {}
 
 class UserRegisteredState extends RegisterState {
   String bearer;
-  DateTime expiresAt;
+  DateTime? expiresAt;
 
-  UserRegisteredState({required this.bearer, required this.expiresAt});
+  UserRegisteredState({required this.bearer, this.expiresAt});
 }
 
 class UserFailedToBeRegisteredState extends RegisterState {}

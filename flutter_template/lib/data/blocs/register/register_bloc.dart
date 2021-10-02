@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter_template/data/blocs/register/register_events.dart';
 import 'package:flutter_template/data/blocs/register/register_states.dart';
@@ -15,7 +17,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
   @override
   void onTransition(Transition<RegisterEvent, RegisterState> transition) {
-    // TODO: implement onTransition
     super.onTransition(transition);
     print(transition);
   }
@@ -27,11 +28,15 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       if(event is UserRegistrationEvent) {
         print('Authentication process has been started');
         yield UserIsRegisteringState();
-        await _authRepository.register(event.email, event.userName, event.password);
-        yield UserRegisteredState(bearer: 'anan', expiresAt: DateTime.now());
+        int response = await _authRepository
+            .register(event.email, event.userName, event.password);
+        if(response != 200 || response != 2)
+          throw Exception(response);
+        yield UserRegisteredState(bearer: 'anan');
     }
-    } catch (_) {
-    yield UserFailedToBeRegisteredState();
+    } catch (ex) {
+      print(ex);
+      yield UserFailedToBeRegisteredState();
     }
   }
 

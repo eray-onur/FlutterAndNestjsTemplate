@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/presentation/screens/home_screen.dart';
 import 'package:flutter_template/presentation/screens/login_screen.dart';
 import 'package:flutter_template/presentation/screens/register_screen.dart';
 
@@ -19,6 +20,7 @@ class TemplateApp extends StatelessWidget {
         '/': (context) => LoginScreen(),
         LoginScreen.route: (context) => LoginScreen(),
         RegisterScreen.route: (context) => RegisterScreen(),
+        HomeScreen.route: (context) => HomeScreen()
       },
       initialRoute: '/',
     );

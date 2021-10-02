@@ -7,6 +7,8 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { UserService } from "src/user/user.service";
 import { CreateUserDto } from "src/user/dtos/create-user.dto";
 import { SigninUserDto } from "src/user/dtos/signin-user.dto";
+import { RegisteredUserDto } from "src/user/dtos/registered-user.dto";
+import { randomUUID } from "crypto";
 
 @Controller('auth')
 export class AuthController {
@@ -21,10 +23,12 @@ export class AuthController {
     }
     
     @Post('/register')
-    async register(@Body() createUserDto: CreateUserDto) {
+    async register(@Body() createUserDto: CreateUserDto) : Promise<RegisteredUserDto> {
         const registeredUser = await this.authService.register(createUserDto);
-        if(registeredUser)
-            return Promise.resolve(registeredUser);
+        if(registeredUser) {
+            const response: RegisteredUserDto = {username: registeredUser.username, appId: randomUUID(), secretKey: 'anan'};
+            return Promise.resolve(response);
+        }
         else throw new HttpException('Failed to register user', HttpStatus.BAD_REQUEST);
     }
 

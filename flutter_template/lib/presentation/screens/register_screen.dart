@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: BlocConsumer<RegisterBloc, RegisterState>(
           listener: (context, state) {
             if(state is UserRegisteredState) {
-              Navigator.of(context).pushNamedAndRemoveUntil('/character', (Route<dynamic> route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
             }
           },
           builder: (context, state) {
