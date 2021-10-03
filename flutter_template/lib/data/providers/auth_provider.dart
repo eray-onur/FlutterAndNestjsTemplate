@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter_template/data/constants.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/models/results/result.dart';
 import 'package:http/http.dart' as http;
+
 class AuthProvider {
 
   Future<Result> login(String username, String password) async {

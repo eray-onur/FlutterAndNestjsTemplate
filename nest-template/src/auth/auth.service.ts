@@ -7,6 +7,7 @@ import { UserService } from '../user/user.service';
 import { apiKey, secret } from './auth.constants';
 import { JwtPayloadDto } from './dtos/jwt-payload.dto';
 import crypto, { createSecretKey } from 'crypto';
+import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,10 +23,10 @@ export class AuthService {
     return Promise.reject('No such user was found.');
   }
 
-  async register(createUserDto: CreateUserDto): Promise<User> {
+  async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
     try {
-      const addedUser = await this.userService.addUser(createUserDto);
-      return Promise.resolve(addedUser);
+      const registeredUser = await this.userService.addUser(createUserDto);
+      return Promise.resolve(registeredUser);
     } catch(err) {
       return Promise.reject(`Failed to create user. Reason: ${err}`);
     }
