@@ -30,8 +30,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         yield UserIsRegisteringState();
         int response = await _authRepository
             .register(event.email, event.userName, event.password);
-        if(response != 200 || response != 2)
+
+        if(![2,200,201].contains(response)) {
           throw Exception(response);
+        }
         yield UserRegisteredState(bearer: 'anan');
     }
     } catch (ex) {

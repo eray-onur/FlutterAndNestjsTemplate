@@ -10,7 +10,7 @@ class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strate
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: auth_constants_1.jwtConstants.secret
+            secretOrKey: auth_constants_1.secret
         });
         this.authService = authService;
     }

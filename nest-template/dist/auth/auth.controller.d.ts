@@ -7,12 +7,8 @@ export declare class AuthController {
     private authService;
     private userService;
     constructor(authService: AuthService, userService: UserService);
-    login(signinUserDto: SigninUserDto): Promise<{
-        access_token: string;
-        message?: undefined;
-    } | {
+    login(signinUserDto: SigninUserDto): Promise<string | {
         message: any;
-        access_token?: undefined;
     }>;
     register(createUserDto: CreateUserDto): Promise<RegisteredUserDto>;
 }

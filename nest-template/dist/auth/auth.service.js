@@ -16,6 +16,7 @@ const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const user_schema_1 = require("../user/user.schema");
 const user_service_1 = require("../user/user.service");
+const auth_constants_1 = require("./auth.constants");
 let AuthService = class AuthService {
     constructor(userService, jwtService) {
         this.userService = userService;
@@ -41,12 +42,13 @@ let AuthService = class AuthService {
         try {
             const foundUser = await this.userService.findOneByUsername(signinUserDto.username);
             if (foundUser) {
-                if (foundUser.password !== signinUserDto.password)
+                if (foundUser.password !== signinUserDto.password) {
                     throw new Error(`Invalid password.`);
-                else
-                    return {
-                        access_token: this.jwtService.sign({ foundUser }),
-                    };
+                }
+                return this.jwtService.sign({
+                    sub: foundUser._id,
+                    username: foundUser.username
+                });
             }
             throw new Error(`Login failed for user ${signinUserDto.username}.`);
         }
@@ -56,6 +58,9 @@ let AuthService = class AuthService {
                 message: ex.message
             };
         }
+    }
+    async provideApiKey() {
+        return await Promise.resolve(auth_constants_1.apiKey);
     }
 };
 AuthService = __decorate([

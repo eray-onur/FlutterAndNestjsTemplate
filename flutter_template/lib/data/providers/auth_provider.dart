@@ -2,40 +2,59 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_template/data/constants.dart';
+import 'package:flutter_template/data/models/results/data_result.dart';
+import 'package:flutter_template/data/models/results/result.dart';
 import 'package:http/http.dart' as http;
 class AuthProvider {
 
-  Future<dynamic> login(String username, String password) async {
-    var response = await http.post(
-      Uri(path: "$API_ENDPOINT/authorize"),
-      headers: {
-        HttpHeaders.contentTypeHeader: 'application/json',
-      },
-      body: {
-        "username": username,
-        "password": password
-      }
-    );
-    if(response.statusCode == 200)
-      return response.body;
-
-    return null;
+  Future<Result> login(String username, String password) async {
+    try {
+      var response = await http.post(
+          Uri.http("10.0.2.2:3000", "/auth/login"),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+          },
+          body: jsonEncode({
+            "username": username,
+            "password": password
+          })
+      );
+      if(response.statusCode < 400)
+        return DataResult(
+            resultCode: response.statusCode,
+            data: response.body, message: 'Returned data'
+        );
+      else throw Exception(response);
+    } catch(err) {
+      print(err);
+    }
+    return Result(resultCode: HttpStatus.noContent, message: "N/A");
   }
 
-  Future<dynamic> register(String email, String username, String password) async {
-    var response = await http.post(
-      Uri.http("localhost:3000", "/auth/register"),
-      body: jsonEncode({
-        "email": email,
-        "username": username,
-        "password": password,
-      }),
-      headers: {
-        HttpHeaders.contentTypeHeader: 'application/json'
-      }
-    );
-    print(response.body);
-    return response.statusCode;
+  Future<Result> register(String email, String username, String password) async {
+    try {
+      var response = await http.post(
+          Uri.http("localhost:3000", "/auth/register"),
+          body: jsonEncode({
+            "email": email,
+            "username": username,
+            "password": password,
+          }),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json'
+          }
+      );
+      if(response.statusCode < 400)
+        return DataResult(
+            resultCode: response.statusCode,
+            data: response.body, message: 'Returned data'
+        );
+      else throw Exception(response);
+    } catch(ex) {
+      print(ex);
+    }
+    return Result(resultCode: HttpStatus.noContent, message: "N/A");
   }
+
 
 }

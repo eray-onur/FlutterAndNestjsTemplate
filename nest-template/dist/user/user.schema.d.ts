@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { Document } from "mongoose";
 export declare type UserDocument = User & Document;
 export declare class User {
+    _id: string;
     email: string;
     username: string;
     password: string;

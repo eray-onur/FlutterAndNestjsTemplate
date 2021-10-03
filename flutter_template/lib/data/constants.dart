@@ -1,1 +1,1 @@
-const API_ENDPOINT = 'localhost:3000';
+const API_ENDPOINT = '10.0.2.2:3000';

@@ -1,11 +1,17 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_template/data/blocs/login/login_states.dart';
+import 'package:flutter_template/data/repositories/auth_repository.dart';
 
 import 'login_events.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
-  LoginBloc() : super(LoginState());
+  late AuthRepository _authRepository;
+
+  LoginBloc({required AuthRepository authRepository}) :
+        _authRepository = authRepository,
+        super(LoginState());
+
 
   LoginState get initialState => UserNotAuthenticatedState();
 
@@ -16,10 +22,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if(event is UserAuthenticationEvent) {
         print('Authentication process has been started');
         yield UserAuthenticatingState();
-        await Future.delayed(Duration(seconds: 6));
-        yield UserAuthenticatedState(bearer: 'secret', expiresAt: DateTime.now());
+        bool response = await _authRepository
+            .login(event.userName, event.password);
+        if(response)
+          yield UserAuthenticatedState(bearer: 'secret', expiresAt: DateTime.now());
+        else throw Error();
       }
     } catch (_) {
+      print(_);
       yield UserFailedToBeAuthenticatedState();
     }
   }

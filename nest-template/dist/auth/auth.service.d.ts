@@ -8,13 +8,10 @@ export declare class AuthService {
     private readonly userService;
     private jwtService;
     constructor(userService: UserService, jwtService: JwtService);
-    validateUser(payload: JwtPayloadDto): Promise<any>;
+    validateUser(payload: JwtPayloadDto): Promise<User>;
     register(createUserDto: CreateUserDto): Promise<User>;
-    login(signinUserDto: SigninUserDto): Promise<{
-        access_token: string;
-        message?: undefined;
-    } | {
+    login(signinUserDto: SigninUserDto): Promise<string | {
         message: any;
-        access_token?: undefined;
     }>;
+    provideApiKey(): Promise<string>;
 }

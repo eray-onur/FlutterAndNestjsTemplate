@@ -14,15 +14,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
-const login_dto_1 = require("../common/entities/dtos/login.dto");
-const register_dto_1 = require("../common/entities/dtos/register.dto");
 const auth_service_1 = require("./auth.service");
-const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const user_service_1 = require("../user/user.service");
 const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
-const crypto_1 = require("crypto");
 let AuthController = class AuthController {
     constructor(authService, userService) {
         this.authService = authService;
@@ -34,7 +30,7 @@ let AuthController = class AuthController {
     async register(createUserDto) {
         const registeredUser = await this.authService.register(createUserDto);
         if (registeredUser) {
-            const response = { username: registeredUser.username, appId: (0, crypto_1.randomUUID)(), secretKey: 'anan' };
+            const response = { username: registeredUser.username };
             return Promise.resolve(response);
         }
         else

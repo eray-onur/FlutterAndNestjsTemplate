@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_template/data/blocs/login/login_bloc.dart';
 import 'package:flutter_template/data/blocs/login/login_events.dart';
 import 'package:flutter_template/data/blocs/login/login_states.dart';
+import 'package:flutter_template/data/repositories/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
   static const route = '/login';
@@ -29,30 +30,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LoginBloc(),
-      child: BlocConsumer<LoginBloc, LoginState>(
-        listener: (context, state) => _authenticate(context,state),
-        builder: (context, state) {
-          loginBloc = BlocProvider.of<LoginBloc>(context);
-          return SafeArea(
-            child: Scaffold(
-                resizeToAvoidBottomInset: false,
-                body: Container(
-                  constraints: BoxConstraints.expand(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildLoginHeader(context),
-                      _buildLoginForm(context),
-                      _buildLoginFooter(context)
-                    ],
-                  ),
-                )
-            ),
-          );
-        },
+    return RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: BlocProvider(
+        create: (context) => LoginBloc(authRepository: context.read<AuthRepository>()),
+        child: BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) => _authenticate(context,state),
+          builder: (context, state) {
+            loginBloc = BlocProvider.of<LoginBloc>(context);
+            return SafeArea(
+              child: Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: Container(
+                    constraints: BoxConstraints.expand(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildLoginHeader(context),
+                        _buildLoginForm(context),
+                        _buildLoginFooter(context)
+                      ],
+                    ),
+                  )
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -206,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _authenticate(BuildContext context, LoginState state) {
     if(state is UserAuthenticatedState) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/hub', (Route<dynamic> route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
     }
   }
 

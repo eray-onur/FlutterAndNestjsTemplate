@@ -4,7 +4,9 @@ import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { SigninUserDto } from 'src/user/dtos/signin-user.dto';
 import { User } from 'src/user/user.schema';
 import { UserService } from '../user/user.service';
+import { apiKey, secret } from './auth.constants';
 import { JwtPayloadDto } from './dtos/jwt-payload.dto';
+import crypto, { createSecretKey } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +14,7 @@ export class AuthService {
     private readonly userService: UserService,
     private jwtService: JwtService) {}
 
-  async validateUser(payload: JwtPayloadDto): Promise<any> {
+  async validateUser(payload: JwtPayloadDto): Promise<User> {
     const user = await this.userService.findOneByUsername(payload.username);
     if (user) {
       return Promise.resolve(user);
@@ -35,11 +37,14 @@ export class AuthService {
         signinUserDto.username
       );
       if (foundUser) {
-        if(foundUser.password !== signinUserDto.password)
+        if(foundUser.password !== signinUserDto.password) {
           throw new Error(`Invalid password.`);
-        else return {
-          access_token: this.jwtService.sign({foundUser}),
         }
+        
+        return this.jwtService.sign({
+          sub: foundUser._id, 
+          username: foundUser.username
+        });
       }
       throw new Error(`Login failed for user ${signinUserDto.username}.`);
     } catch (ex) {
@@ -48,6 +53,9 @@ export class AuthService {
         message: ex.message
       };
     }
-    
+  }
+
+  async provideApiKey(): Promise<string> {
+    return await Promise.resolve(apiKey);
   }
 }
