@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_template/data/models/dtos/created_user.dto.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/models/results/result.dart';
 import 'package:flutter_template/data/providers/auth_provider.dart';
@@ -25,8 +26,16 @@ class AuthRepository {
     }
   }
 
-  Future<Result> register(String email, String username, String password) async {
+  Future<CreatedUserDto?> register(String email, String username, String password) async {
     var hashedPassword = HashHelper.hashPassword(password);
-    return await this.authProvider.register(email, username, hashedPassword);
+    try {
+      var result = await this.authProvider.register(email, username, hashedPassword);
+      if(result is DataResult) {
+        return result.data;
+      }
+    } catch(ex) {
+      print(ex);
+    }
+    return null;
   }
 }

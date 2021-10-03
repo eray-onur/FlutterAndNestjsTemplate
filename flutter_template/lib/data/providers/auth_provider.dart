@@ -47,7 +47,7 @@ class AuthProvider {
       if(response.statusCode < 400)
         return DataResult(
             resultCode: response.statusCode,
-            data: response.body, message: 'Returned data'
+            data: response.body, message: "Returned new user's info."
         );
       else throw Exception(response);
     } catch(ex) {

@@ -28,13 +28,11 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       if(event is UserRegistrationEvent) {
         print('Authentication process has been started');
         yield UserIsRegisteringState();
-        int response = await _authRepository
+        var registeredUser = await _authRepository
             .register(event.email, event.userName, event.password);
-
-        if(![2,200,201].contains(response)) {
-          throw Exception(response);
-        }
-        yield UserRegisteredState(bearer: 'anan');
+        if(registeredUser != null) {
+          yield UserRegisteredState(bearer: registeredUser.username);
+        } else throw Exception('User failed to be registered.');
     }
     } catch (ex) {
       print(ex);
