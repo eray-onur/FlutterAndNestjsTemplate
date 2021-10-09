@@ -43,8 +43,6 @@ class AuthProvider {
             HttpHeaders.contentTypeHeader: 'application/json'
           }
       );
-      print('RESULT:');
-      print(response.body);
       if(response.statusCode < 400)
         return DataResult(
             resultCode: response.statusCode,

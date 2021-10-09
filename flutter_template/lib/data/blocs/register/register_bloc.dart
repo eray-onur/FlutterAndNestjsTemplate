@@ -24,17 +24,22 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   @override
   Stream<RegisterState> mapEventToState(RegisterEvent event) async* {
     yield initialState;
+
     try {
       if(event is UserRegistrationEvent) {
-        print('Authentication process has been started');
+
         yield UserIsRegisteringState();
+
         var registeredUser = await _authRepository
             .register(event.email, event.userName, event.password);
-        print(registeredUser);
+
         if(registeredUser != null) {
-          yield UserRegisteredState(bearer: registeredUser.username);
-        } else throw Exception('User failed to be registered.');
-    }
+          yield UserRegisteredState(token: registeredUser.token);
+        } else {
+          throw Exception('User failed to be registered.');
+        }
+
+      }
     } catch (ex) {
       print(ex);
       yield UserFailedToBeRegisteredState();

@@ -1,9 +1,9 @@
 class AuthorizedUserDto {
-  String userId;
-  String username;
+  final String username;
+  final String token;
 
-  AuthorizedUserDto({
-    required this.userId,
-    required this.username
+  const AuthorizedUserDto({
+    required this.username,
+    required this.token
   });
 }

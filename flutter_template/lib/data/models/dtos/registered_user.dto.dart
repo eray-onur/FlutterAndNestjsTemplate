@@ -1,10 +1,10 @@
 class RegisteredUserDto {
-  String username;
-  String? token;
+  final String username;
+  final String token;
 
-  RegisteredUserDto({
+  const RegisteredUserDto({
     required this.username,
-    this.token
+    required this.token
   });
 
   factory RegisteredUserDto.fromJson(dynamic json) {
