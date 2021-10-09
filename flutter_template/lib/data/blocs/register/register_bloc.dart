@@ -30,6 +30,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         yield UserIsRegisteringState();
         var registeredUser = await _authRepository
             .register(event.email, event.userName, event.password);
+        print(registeredUser);
         if(registeredUser != null) {
           yield UserRegisteredState(bearer: registeredUser.username);
         } else throw Exception('User failed to be registered.');

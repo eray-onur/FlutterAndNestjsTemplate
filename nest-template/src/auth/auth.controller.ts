@@ -20,12 +20,11 @@ export class AuthController {
     @Post('/register')
     async register(@Body() createUserDto: CreateUserDto) : Promise<RegisteredUserDto> {
         const registeredUser = await this.authService.register(createUserDto);
-        
+        console.log(registeredUser);
         if(registeredUser) {
-            const response: RegisteredUserDto = {username: registeredUser.username};
-            return Promise.resolve(response);
+            return Promise.resolve(registeredUser);
         }
-        else throw new HttpException('Failed to register user', HttpStatus.BAD_REQUEST);
+        else throw new HttpException('Failed to register user.', HttpStatus.BAD_REQUEST);
     }
 
 

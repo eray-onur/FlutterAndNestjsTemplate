@@ -33,7 +33,7 @@ class AuthProvider {
   Future<Result> register(String email, String username, String password) async {
     try {
       var response = await http.post(
-          Uri.http("localhost:3000", "/auth/register"),
+          Uri.http("10.0.2.2:3000", "/auth/register"),
           body: jsonEncode({
             "email": email,
             "username": username,
@@ -43,12 +43,14 @@ class AuthProvider {
             HttpHeaders.contentTypeHeader: 'application/json'
           }
       );
+      print('RESULT:');
+      print(response.body);
       if(response.statusCode < 400)
         return DataResult(
             resultCode: response.statusCode,
             data: response.body, message: "Returned new user's info."
         );
-      else throw Exception(response);
+      else throw Exception(response.body);
     } catch(ex) {
       print(ex);
     }

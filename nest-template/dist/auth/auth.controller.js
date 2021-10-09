@@ -29,12 +29,12 @@ let AuthController = class AuthController {
     }
     async register(createUserDto) {
         const registeredUser = await this.authService.register(createUserDto);
+        console.log(registeredUser);
         if (registeredUser) {
-            const response = { username: registeredUser.username };
-            return Promise.resolve(response);
+            return Promise.resolve(registeredUser);
         }
         else
-            throw new common_1.HttpException('Failed to register user', common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException('Failed to register user.', common_1.HttpStatus.BAD_REQUEST);
     }
 };
 __decorate([

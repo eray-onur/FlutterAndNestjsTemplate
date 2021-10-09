@@ -6,8 +6,8 @@ import { User } from 'src/user/user.schema';
 import { UserService } from '../user/user.service';
 import { apiKey, secret } from './auth.constants';
 import { JwtPayloadDto } from './dtos/jwt-payload.dto';
-import crypto, { createSecretKey } from 'crypto';
 import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
+import { saltRounds } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +25,27 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
     try {
-      const registeredUser = await this.userService.addUser(createUserDto);
-      return Promise.resolve(registeredUser);
+        const bcrypt = require('bcrypt');
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(createUserDto.password, salt);
+        const newUser = {
+          email: createUserDto.email,
+          username: createUserDto.username,
+          password: hash
+        };
+        const addedUser = await this.userService.addUser(newUser);
+        const token = await this.jwtService.signAsync({
+          sub: addedUser._id, 
+          username: addedUser.username
+        });
+        const registeredUserDto : RegisteredUserDto = {
+          username: addedUser.username,
+          token: token
+        };
+
+        return registeredUserDto;
     } catch(err) {
+      console.error(err);
       return Promise.reject(`Failed to create user. Reason: ${err}`);
     }
   }
@@ -42,7 +60,7 @@ export class AuthService {
           throw new Error(`Invalid password.`);
         }
         
-        return this.jwtService.sign({
+        return await this.jwtService.signAsync({
           sub: foundUser._id, 
           username: foundUser.username
         });

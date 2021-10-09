@@ -17,6 +17,8 @@ const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const user_schema_1 = require("../user/user.schema");
 const user_service_1 = require("../user/user.service");
 const auth_constants_1 = require("./auth.constants");
+const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
+const constants_1 = require("../common/constants");
 let AuthService = class AuthService {
     constructor(userService, jwtService) {
         this.userService = userService;
@@ -31,10 +33,27 @@ let AuthService = class AuthService {
     }
     async register(createUserDto) {
         try {
-            const addedUser = await this.userService.addUser(createUserDto);
-            return Promise.resolve(addedUser);
+            const bcrypt = require('bcrypt');
+            const salt = await bcrypt.genSalt(constants_1.saltRounds);
+            const hash = await bcrypt.hash(createUserDto.password, salt);
+            const newUser = {
+                email: createUserDto.email,
+                username: createUserDto.username,
+                password: hash
+            };
+            const addedUser = await this.userService.addUser(newUser);
+            const token = await this.jwtService.signAsync({
+                sub: addedUser._id,
+                username: addedUser.username
+            });
+            const registeredUserDto = {
+                username: addedUser.username,
+                token: token
+            };
+            return registeredUserDto;
         }
         catch (err) {
+            console.error(err);
             return Promise.reject(`Failed to create user. Reason: ${err}`);
         }
     }
@@ -45,7 +64,7 @@ let AuthService = class AuthService {
                 if (foundUser.password !== signinUserDto.password) {
                     throw new Error(`Invalid password.`);
                 }
-                return this.jwtService.sign({
+                return await this.jwtService.signAsync({
                     sub: foundUser._id,
                     username: foundUser.username
                 });

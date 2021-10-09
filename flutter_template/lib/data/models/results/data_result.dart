@@ -6,6 +6,6 @@ class DataResult extends Result {
   String message;
 
   DataResult({this.data, required this.resultCode, required this.message}) :
-        super(resultCode: super.resultCode, message: super.message);
+        super(resultCode: resultCode, message: message);
 
 }
