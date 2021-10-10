@@ -27,6 +27,10 @@ __decorate([
 ], User.prototype, "password", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "password_salt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], User.prototype, "created_at", void 0);
 __decorate([

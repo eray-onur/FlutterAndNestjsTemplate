@@ -5,10 +5,10 @@ class UserNotAuthenticatedState extends LoginState {}
 class UserAuthenticatingState extends LoginState {}
 
 class UserAuthenticatedState extends LoginState {
-  String bearer;
-  DateTime expiresAt;
+  String username;
+  String token;
 
-  UserAuthenticatedState({required this.bearer, required this.expiresAt});
+  UserAuthenticatedState({required this.username, required this.token});
 }
 
 class UserFailedToBeAuthenticatedState extends LoginState {}

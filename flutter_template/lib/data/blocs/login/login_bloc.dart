@@ -22,21 +22,25 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if(event is UserAuthenticationEvent) {
         print('Authentication process has been started');
         yield UserAuthenticatingState();
-        bool response = await _authRepository
+
+        var authorizedUser = await _authRepository
             .login(event.userName, event.password);
-        if(response)
-          yield UserAuthenticatedState(bearer: 'secret', expiresAt: DateTime.now());
-        else throw Error();
+
+        if(authorizedUser != null) {
+          yield UserAuthenticatedState(
+              username: authorizedUser.username,
+              token: authorizedUser.token
+          );
+        } else throw Error();
+
       }
     } catch (_) {
-      print(_);
       yield UserFailedToBeAuthenticatedState();
     }
   }
 
   @override
   void onTransition(Transition<LoginEvent, LoginState> transition) {
-    // TODO: implement onTransition
     super.onTransition(transition);
     print(transition);
   }

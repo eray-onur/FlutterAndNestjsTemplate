@@ -8,6 +8,7 @@ import { apiKey, secret } from './auth.constants';
 import { JwtPayloadDto } from './dtos/jwt-payload.dto';
 import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
 import { saltRounds } from 'src/common/constants';
+import { AuthorizedUserDto } from 'src/user/dtos/authorized-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,52 +26,65 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
     try {
-        const bcrypt = require('bcrypt');
-        const salt = await bcrypt.genSalt(saltRounds);
-        const hash = await bcrypt.hash(createUserDto.password, salt);
-        const newUser = {
-          email: createUserDto.email,
-          username: createUserDto.username,
-          password: hash
-        };
-        const addedUser = await this.userService.addUser(newUser);
-        const token = await this.jwtService.signAsync({
-          sub: addedUser._id, 
-          username: addedUser.username
-        });
-        const registeredUserDto : RegisteredUserDto = {
-          username: addedUser.username,
-          token: token
-        };
+      const bcrypt = require('bcrypt');
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-        return registeredUserDto;
+      const newUser: User = {
+        email: createUserDto.email,
+        username: createUserDto.username,
+        password: hashedPassword,
+        password_salt: salt,
+        created_at: new Date()
+      };
+
+      const addedUser = await this.userService.addUser(newUser);
+      const token = await this.jwtService.signAsync({
+        sub: addedUser._id, 
+        username: addedUser.username
+      });
+      const registeredUserDto : RegisteredUserDto = {
+        username: addedUser.username,
+        token: token
+      };
+      return registeredUserDto;
+
     } catch(err) {
       console.error(err);
       return Promise.reject(`Failed to create user. Reason: ${err}`);
     }
   }
 
-  async login(signinUserDto: SigninUserDto) {
+  async login(signinUserDto: SigninUserDto): Promise<AuthorizedUserDto> {
     try {
       const foundUser = await this.userService.findOneByUsername(
         signinUserDto.username
       );
       if (foundUser) {
-        if(foundUser.password !== signinUserDto.password) {
+        const bcrypt = require('bcrypt');
+        const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
+        console.log(`${hashedPassword} -- ${foundUser.password}`);
+
+        if(foundUser.password !== hashedPassword) {
           throw new Error(`Invalid password.`);
         }
-        
-        return await this.jwtService.signAsync({
+
+        const token = await this.jwtService.signAsync({
           sub: foundUser._id, 
           username: foundUser.username
         });
+        
+        const authorizedUser: AuthorizedUserDto = {
+          username: foundUser.username,
+          token: token
+        };
+
+        return authorizedUser;
+
       }
       throw new Error(`Login failed for user ${signinUserDto.username}.`);
     } catch (ex) {
-      console.log(ex.statusCode);
-      return {
-        message: ex.message
-      };
+      console.error(ex);
     }
   }
 

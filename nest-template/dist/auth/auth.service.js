@@ -19,6 +19,7 @@ const user_service_1 = require("../user/user.service");
 const auth_constants_1 = require("./auth.constants");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const constants_1 = require("../common/constants");
+const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
 let AuthService = class AuthService {
     constructor(userService, jwtService) {
         this.userService = userService;
@@ -35,11 +36,13 @@ let AuthService = class AuthService {
         try {
             const bcrypt = require('bcrypt');
             const salt = await bcrypt.genSalt(constants_1.saltRounds);
-            const hash = await bcrypt.hash(createUserDto.password, salt);
+            const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
             const newUser = {
                 email: createUserDto.email,
                 username: createUserDto.username,
-                password: hash
+                password: hashedPassword,
+                password_salt: salt,
+                created_at: new Date()
             };
             const addedUser = await this.userService.addUser(newUser);
             const token = await this.jwtService.signAsync({
@@ -61,21 +64,26 @@ let AuthService = class AuthService {
         try {
             const foundUser = await this.userService.findOneByUsername(signinUserDto.username);
             if (foundUser) {
-                if (foundUser.password !== signinUserDto.password) {
+                const bcrypt = require('bcrypt');
+                const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
+                console.log(`${hashedPassword} -- ${foundUser.password}`);
+                if (foundUser.password !== hashedPassword) {
                     throw new Error(`Invalid password.`);
                 }
-                return await this.jwtService.signAsync({
+                const token = await this.jwtService.signAsync({
                     sub: foundUser._id,
                     username: foundUser.username
                 });
+                const authorizedUser = {
+                    username: foundUser.username,
+                    token: token
+                };
+                return authorizedUser;
             }
             throw new Error(`Login failed for user ${signinUserDto.username}.`);
         }
         catch (ex) {
-            console.log(ex.statusCode);
-            return {
-                message: ex.message
-            };
+            console.error(ex);
         }
     }
     async provideApiKey() {

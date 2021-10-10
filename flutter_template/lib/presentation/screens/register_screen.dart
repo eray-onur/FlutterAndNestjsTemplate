@@ -42,6 +42,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           listener: (context, state) {
             if(state is UserRegisteredState) {
               Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+              print('Token is: ');
+              print(state.token);
             }
           },
           builder: (context, state) {

@@ -4,6 +4,7 @@ import { UserService } from "src/user/user.service";
 import { CreateUserDto } from "src/user/dtos/create-user.dto";
 import { SigninUserDto } from "src/user/dtos/signin-user.dto";
 import { RegisteredUserDto } from "src/user/dtos/registered-user.dto";
+import { AuthorizedUserDto } from "src/user/dtos/authorized-user.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,7 @@ export class AuthController {
     ) {}
 
     @Post('/login')
-    async login(@Body() signinUserDto: SigninUserDto) {
+    async login(@Body() signinUserDto: SigninUserDto): Promise<AuthorizedUserDto> {
         return await this.authService.login(signinUserDto);
     }
     

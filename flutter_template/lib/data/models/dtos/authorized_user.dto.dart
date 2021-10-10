@@ -6,4 +6,9 @@ class AuthorizedUserDto {
     required this.username,
     required this.token
   });
+
+  factory AuthorizedUserDto.fromJson(dynamic json) {
+    return AuthorizedUserDto(username: json['username'], token: json['token']);
+  }
+
 }

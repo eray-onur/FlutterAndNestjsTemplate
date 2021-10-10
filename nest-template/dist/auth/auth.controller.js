@@ -19,6 +19,7 @@ const user_service_1 = require("../user/user.service");
 const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
+const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
 let AuthController = class AuthController {
     constructor(authService, userService) {
         this.authService = authService;

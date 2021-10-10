@@ -1,26 +1,34 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_template/data/models/dtos/authorized_user.dto.dart';
 import 'package:flutter_template/data/models/dtos/registered_user.dto.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/models/results/result.dart';
 import 'package:flutter_template/data/providers/auth_provider.dart';
+import 'package:flutter_template/data/providers/base/secure_storage_provider.dart';
 import 'package:flutter_template/data/util/hash_helper.dart';
 
 class AuthRepository {
 
-  AuthProvider authProvider = AuthProvider();
+  AuthProvider _authProvider = AuthProvider();
+  SecureStorageProvider _secureStorageProvider = SecureStorageProvider();
 
-  Future login(String username, String password) async {
+  Future<AuthorizedUserDto?> login(String username, String password) async {
     try {
-      var result = await this.authProvider.login(username, password);
+      var result = await _authProvider.login(username, password);
 
       if(result is DataResult) {
-          final storage = FlutterSecureStorage();
-          await storage.write(key: 'tkn', value: result.data);
-          print(result.data);
-      } else throw Exception('Login operation was unsuccessful');
 
+          var authorizedUserDto = AuthorizedUserDto.fromJson(
+            jsonDecode(result.data)
+          );
+
+          _secureStorageProvider.tryInsert('token', authorizedUserDto.token);
+
+          return authorizedUserDto;
+
+      } else throw Exception('Login operation was unsuccessful');
     } catch (ex) {
       print(ex);
     }
@@ -28,15 +36,15 @@ class AuthRepository {
 
   Future<RegisteredUserDto?> register(String email, String username, String password) async {
     try {
-      var result = await this.authProvider.register(email, username, password);
+      var result = await _authProvider.register(email, username, password);
+
       if(result is DataResult) {
 
-        final storage = FlutterSecureStorage();
-        await storage.write(key: 'token', value: result.data);
-
-        return RegisteredUserDto.fromJson(
+        var registeredUserDto = RegisteredUserDto.fromJson(
           jsonDecode(result.data)
         );
+        await _secureStorageProvider.tryInsert('token', registeredUserDto.token);
+        return registeredUserDto;
       }
     } catch(ex) {
       print(ex);
