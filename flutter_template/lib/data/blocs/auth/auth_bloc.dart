@@ -1,37 +1,40 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_template/data/blocs/login/login_states.dart';
+import 'package:flutter_template/data/blocs/login/auth_states.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
-import 'login_events.dart';
+import 'auth_events.dart';
 
-class LoginBloc extends Bloc<LoginEvent, LoginState> {
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   late AuthRepository _authRepository;
 
-  LoginBloc({required AuthRepository authRepository}) :
+  AuthBloc({required AuthRepository authRepository}) :
         _authRepository = authRepository,
-        super(LoginState());
+        super(AuthState());
 
 
-  LoginState get initialState => UserNotAuthenticatedState();
+  AuthState get initialState => UserNotAuthenticatedState();
 
   @override
-  Stream<LoginState> mapEventToState(LoginEvent event) async* {
+  Stream<AuthState> mapEventToState(AuthEvent event) async* {
     yield initialState;
     try {
-      if(event is UserAuthenticationEvent) {
+      if(event is SignInEvent) {
         print('Authentication process has been started');
         yield UserAuthenticatingState();
 
         var authorizedUser = await _authRepository
             .login(event.userName, event.password);
 
-        if(authorizedUser != null) {
+        if (authorizedUser != null) {
           yield UserAuthenticatedState(
               username: authorizedUser.username,
               token: authorizedUser.token
           );
-        } else throw Error();
+        } else
+          throw Error();
+      }
+      else if(event is SignOutEvent) {
 
       }
     } catch (_) {
@@ -40,7 +43,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   @override
-  void onTransition(Transition<LoginEvent, LoginState> transition) {
+  void onTransition(Transition<AuthEvent, AuthState> transition) {
     super.onTransition(transition);
     print(transition);
   }
