@@ -1,28 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { SigninUserDto } from 'src/user/dtos/signin-user.dto';
 import { User } from 'src/user/user.schema';
 import { UserService } from '../user/user.service';
-import { apiKey, secret } from './auth.constants';
-import { JwtPayloadDto } from './dtos/jwt-payload.dto';
 import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
 import { saltRounds } from 'src/common/constants';
 import { AuthorizedUserDto } from 'src/user/dtos/authorized-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userService: UserService,
-    private jwtService: JwtService) {}
-
-  async validateUser(payload: JwtPayloadDto): Promise<User> {
-    const user = await this.userService.findOneByUsername(payload.username);
-    if (user) {
-      return Promise.resolve(user);
-    }
-    return Promise.reject('No such user was found.');
-  }
+  constructor(private readonly userService: UserService, private jwtService: JwtService) {}
 
   async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
     try {
@@ -65,8 +53,8 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
         console.log(`${hashedPassword} -- ${foundUser.password}`);
 
-        if(foundUser.password !== hashedPassword) {
-          throw new Error(`Invalid password.`);
+        if(hashedPassword !== foundUser.password) {
+          throw new UnauthorizedException(`Invalid password.`);
         }
 
         const token = await this.jwtService.signAsync({
@@ -82,13 +70,11 @@ export class AuthService {
         return authorizedUser;
 
       }
-      throw new Error(`Login failed for user ${signinUserDto.username}.`);
+      else throw new NotFoundException(`User does not exist in the system.`);
     } catch (ex) {
       console.error(ex);
+      return null;
     }
   }
 
-  async provideApiKey(): Promise<string> {
-    return await Promise.resolve(apiKey);
-  }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_template/data/blocs/register/register_bloc.dart';
-import 'package:flutter_template/data/blocs/register/register_events.dart';
-import 'package:flutter_template/data/blocs/register/register_states.dart';
+import 'package:flutter_template/data/blocs/auth/auth_bloc.dart';
+import 'package:flutter_template/data/blocs/auth/auth_events.dart';
+import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,7 +15,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   late AuthRepository authRepository;
-  late RegisterBloc registerBloc;
+  late AuthBloc registerBloc;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -37,8 +37,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return RepositoryProvider(
       create: (context) => AuthRepository(),
       child: BlocProvider(
-        create: (context) => RegisterBloc(authRepository: context.read<AuthRepository>()),
-        child: BlocConsumer<RegisterBloc, RegisterState>(
+        create: (context) => AuthBloc(authRepository: context.read<AuthRepository>()),
+        child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if(state is UserRegisteredState) {
               Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
@@ -47,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             }
           },
           builder: (context, state) {
-            registerBloc = BlocProvider.of<RegisterBloc>(context);
+            registerBloc = BlocProvider.of<AuthBloc>(context);
             return SafeArea(
               child: Scaffold(
                   resizeToAvoidBottomInset: false,
@@ -178,7 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           TextButton(
             child: Text("Already have an account? Just sign in!"),
-            onPressed: (registerBloc.state is UserIsRegisteringState)
+            onPressed: (registerBloc.state is UserRegisteringState)
                 ? null
                 : () => _navigateToLogin(context),
           ),
@@ -194,7 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: Visibility(
-              visible: (registerBloc.state is UserIsRegisteringState),
+              visible: (registerBloc.state is UserRegisteringState),
               child: CircularProgressIndicator(
                 color: Colors.white,
                 strokeWidth: 3,
@@ -207,7 +207,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           )
         ],
       ),
-      onPressed: (registerBloc.state is UserIsRegisteringState)
+      onPressed: (registerBloc.state is UserRegisteringState)
           ? null
           : () => _startRegistration(context),
     );
@@ -226,14 +226,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _startRegistration(BuildContext context) {
     var userName = _usernameController.value.text;
     var password = _passwordController.value.text;
-    registerBloc.add(UserRegistrationEvent(
+    registerBloc.add(
+        SignUpEvent (
         email: email,
         userName: userName,
         password: password
-    ));
+      )
+    );
   }
 
   void _navigateToLogin(BuildContext context) {
-    Navigator.of(context).pushNamed('/login');
+    Navigator.of(context).pushNamed('/auth');
   }
 }

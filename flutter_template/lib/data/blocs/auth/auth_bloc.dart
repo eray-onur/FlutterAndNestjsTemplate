@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_template/data/blocs/login/auth_states.dart';
+import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
 import 'auth_events.dart';
@@ -18,28 +18,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   Stream<AuthState> mapEventToState(AuthEvent event) async* {
     yield initialState;
-    try {
-      if(event is SignInEvent) {
-        print('Authentication process has been started');
-        yield UserAuthenticatingState();
 
-        var authorizedUser = await _authRepository
-            .login(event.userName, event.password);
+    if(event is SignInEvent) {
+      print('Authentication process has been started');
+      yield UserAuthenticatingState();
 
-        if (authorizedUser != null) {
-          yield UserAuthenticatedState(
-              username: authorizedUser.username,
-              token: authorizedUser.token
-          );
-        } else
-          throw Error();
+      var authorizedUser = await _authRepository
+          .login(event.userName, event.password);
+
+      if (authorizedUser != null) {
+        print('AUTH');
+
+        yield UserAuthenticatedState(
+            username: authorizedUser.username,
+            token: authorizedUser.token
+        );
+      } else {
+        print('NOT AUTH');
+        yield UserFailedToBeAuthenticatedState();
       }
-      else if(event is SignOutEvent) {
-
-      }
-    } catch (_) {
-      yield UserFailedToBeAuthenticatedState();
     }
+    else if(event is SignOutEvent) {
+      await _authRepository.logout();
+      yield UserNotAuthenticatedState();
+    }
+    else if(event is SignUpEvent) {
+      var registeredUser = await _authRepository
+          .register(event.email, event.userName, event.password);
+
+      print(registeredUser?.username);
+
+      if(registeredUser != null) {
+        yield UserRegisteredState(token: registeredUser.token);
+      } else {
+        yield UserFailedToRegisterState();
+      }
+    }
+    else if(event is AutoSignInEvent) {
+      String? foundToken = await _authRepository.findStoredToken();
+      if(foundToken != null) {
+        // Validate via found token. Work in progress.
+      }
+    }
+
   }
 
   @override

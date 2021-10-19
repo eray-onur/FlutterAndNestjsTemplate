@@ -17,11 +17,19 @@ class UserAuthenticatedState extends AuthState {
 // When service does not authenticate the user.
 class UserFailedToBeAuthenticatedState extends AuthState {}
 
-// User created an account successfully.
+// User did not register yet.
 class UserNotRegisteredState extends AuthState {}
 
 // User is still waiting for account creation.
 class UserRegisteringState extends AuthState {}
+
+// User created an account successfully.
+class UserRegisteredState extends AuthState {
+  String token;
+
+  UserRegisteredState({required this.token});
+}
+
 
 // Service failed to create new account for user for any reason.
 class UserFailedToRegisterState extends AuthState {}

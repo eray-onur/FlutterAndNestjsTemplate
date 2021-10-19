@@ -12,47 +12,36 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
+exports.DummyController = void 0;
 const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const create_user_dto_1 = require("../user/dtos/create-user.dto");
-const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
-const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
-const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
-let AuthController = class AuthController {
-    constructor(authService) {
-        this.authService = authService;
-    }
-    async login(signinUserDto) {
-        return await this.authService.login(signinUserDto);
+let DummyController = class DummyController {
+    constructor() { }
+    dummyGet(req) {
+        return 'DUMMY GET RESULT';
     }
     async register(createUserDto) {
-        const registeredUser = await this.authService.register(createUserDto);
-        console.log(registeredUser);
-        if (registeredUser) {
-            return Promise.resolve(registeredUser);
-        }
-        else
-            throw new common_1.HttpException('Failed to register user.', common_1.HttpStatus.BAD_REQUEST);
     }
 };
 __decorate([
-    (0, common_1.Post)('/login'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('/dummyGet'),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "login", null);
+    __metadata("design:returntype", void 0)
+], DummyController.prototype, "dummyGet", null);
 __decorate([
-    (0, common_1.Post)('/register'),
+    (0, common_1.Post)('/dummyPost'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "register", null);
-AuthController = __decorate([
-    (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
-], AuthController);
-exports.AuthController = AuthController;
-//# sourceMappingURL=auth.controller.js.map
+], DummyController.prototype, "register", null);
+DummyController = __decorate([
+    (0, common_1.Controller)('dummy'),
+    __metadata("design:paramtypes", [])
+], DummyController);
+exports.DummyController = DummyController;
+//# sourceMappingURL=dummy.controller.js.map

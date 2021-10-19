@@ -1,6 +1,7 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+import { UserService } from "src/user/user.service";
 import { UserModule } from "../user/user.module";
 import { secret } from "./auth.constants";
 import { AuthController } from "./auth.controller";
@@ -14,7 +15,7 @@ import { LocalStrategy } from "./strategies/local.strategy";
         PassportModule,
         JwtModule.register({
             secret: secret,
-            signOptions: { expiresIn: '1800s' },
+            signOptions: { expiresIn: '6000s' },
         })
     ],
     controllers: [AuthController],

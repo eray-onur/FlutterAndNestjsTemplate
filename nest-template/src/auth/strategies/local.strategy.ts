@@ -1,6 +1,7 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-local";
+import { SigninUserDto } from "src/user/dtos/signin-user.dto";
 import { AuthService } from "../auth.service";
 
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -8,11 +9,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         super();
     }
 
-    async validate(username: string, password: string): Promise<any> {
-        // const user = await this.authService.validateUser(username, password);
-        // if(!user) {
-        //     throw new UnauthorizedException('Failed to validate user.');
-        // }
-        // return user;
+    async validate(username: string, password:string): Promise<any> {
+        const userInfo = await this.authService.login({username, password});
+        if(!userInfo) {
+            throw new UnauthorizedException();
+        }
+        return userInfo;
     }
 }

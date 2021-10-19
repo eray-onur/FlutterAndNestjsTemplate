@@ -13,7 +13,7 @@ class SecureStorageProvider {
     return await _storage.readAll();
   }
 
-  Future getValueByKey(String key) async {
+  Future<String?> getValueByKey(String key) async {
      return await _storage.read(key: key);
   }
 

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_template/data/blocs/login/login_bloc.dart';
-import 'package:flutter_template/data/blocs/login/login_events.dart';
-import 'package:flutter_template/data/blocs/login/login_states.dart';
+import 'package:flutter_template/data/blocs/auth/auth_bloc.dart';
+import 'package:flutter_template/data/blocs/auth/auth_events.dart';
+import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
+import 'home_screen.dart';
+
 class LoginScreen extends StatefulWidget {
-  static const route = '/login';
+  static const route = '/auth';
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
@@ -14,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late LoginBloc loginBloc;
+  late AuthBloc loginBloc;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -23,21 +25,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    super.initState();
     _usernameController.addListener(_setUserName);
     _passwordController.addListener(_setPassword);
+    loginBloc = AuthBloc(
+      authRepository: AuthRepository(),
+    )..add(AutoSignInEvent());
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        create: (context) => LoginBloc(authRepository: context.read<AuthRepository>()),
-        child: BlocConsumer<LoginBloc, LoginState>(
-          listener: (context, state) => _authenticate(context,state),
+    return BlocProvider(
+        create: (context) => loginBloc,
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) => _authenticate(context, state),
           builder: (context, state) {
-            loginBloc = BlocProvider.of<LoginBloc>(context);
+            loginBloc = BlocProvider.of<AuthBloc>(context);
             return SafeArea(
               child: Scaffold(
                   resizeToAvoidBottomInset: false,
@@ -57,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
         ),
-      ),
     );
   }
 
@@ -200,17 +202,18 @@ class _LoginScreenState extends State<LoginScreen> {
   void _startAuthentication(BuildContext context) {
     var userName = _usernameController.value.text;
     var password = _passwordController.value.text;
-    print(loginBloc.state.runtimeType);
-    loginBloc.add(UserAuthenticationEvent(
+
+    loginBloc.add(SignInEvent(
         userName: userName,
         password: password
     ));
-    print(loginBloc.state.runtimeType);
   }
 
-  void _authenticate(BuildContext context, LoginState state) {
+  void _authenticate(BuildContext context, AuthState state) {
     if(state is UserAuthenticatedState) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          HomeScreen.route, (Route<dynamic> route) => false
+      );
     }
   }
 

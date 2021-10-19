@@ -8,10 +8,10 @@ class SignInEvent extends AuthEvent {
   SignInEvent({required this.userName, required this.password});
 }
 
-//Logout
-class SignOutEvent extends AuthEvent {
+class AutoSignInEvent extends AuthEvent {}
 
-}
+//Logout
+class SignOutEvent extends AuthEvent {}
 
 // Register
 class SignUpEvent extends AuthEvent {

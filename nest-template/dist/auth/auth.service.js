@@ -16,7 +16,6 @@ const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const user_schema_1 = require("../user/user.schema");
 const user_service_1 = require("../user/user.service");
-const auth_constants_1 = require("./auth.constants");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const constants_1 = require("../common/constants");
 const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
@@ -24,13 +23,6 @@ let AuthService = class AuthService {
     constructor(userService, jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
-    }
-    async validateUser(payload) {
-        const user = await this.userService.findOneByUsername(payload.username);
-        if (user) {
-            return Promise.resolve(user);
-        }
-        return Promise.reject('No such user was found.');
     }
     async register(createUserDto) {
         try {
@@ -67,8 +59,8 @@ let AuthService = class AuthService {
                 const bcrypt = require('bcrypt');
                 const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
                 console.log(`${hashedPassword} -- ${foundUser.password}`);
-                if (foundUser.password !== hashedPassword) {
-                    throw new Error(`Invalid password.`);
+                if (hashedPassword !== foundUser.password) {
+                    throw new common_1.UnauthorizedException(`Invalid password.`);
                 }
                 const token = await this.jwtService.signAsync({
                     sub: foundUser._id,
@@ -80,20 +72,18 @@ let AuthService = class AuthService {
                 };
                 return authorizedUser;
             }
-            throw new Error(`Login failed for user ${signinUserDto.username}.`);
+            else
+                throw new common_1.NotFoundException(`User does not exist in the system.`);
         }
         catch (ex) {
             console.error(ex);
+            return null;
         }
-    }
-    async provideApiKey() {
-        return await Promise.resolve(auth_constants_1.apiKey);
     }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        jwt_1.JwtService])
+    __metadata("design:paramtypes", [user_service_1.UserService, jwt_1.JwtService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map
