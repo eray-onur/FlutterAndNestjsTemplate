@@ -33,17 +33,13 @@ let UserController = class UserController {
         console.log(users);
         return Promise.resolve(users);
     }
-    async getUsersById(id) {
-    }
-    getUsersByPage() {
-        return 'anan';
-    }
     async createUser(createUserDto) {
         return await this.userService.addUser(createUserDto);
     }
 };
 __decorate([
     (0, common_1.Get)('/getByUsername/:name'),
+    __param(0, (0, common_1.Param)('username')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -54,19 +50,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAll", null);
-__decorate([
-    (0, common_1.Get)(),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "getUsersById", null);
-__decorate([
-    (0, common_1.Get)('/getUsersByPage'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "getUsersByPage", null);
 __decorate([
     (0, common_1.Post)('/createUser'),
     __param(0, (0, common_1.Body)()),

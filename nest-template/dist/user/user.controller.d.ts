@@ -6,7 +6,5 @@ export declare class UserController {
     constructor(userService: UserService);
     getByUsername(username: string): Promise<User>;
     getAll(): Promise<Array<User>>;
-    getUsersById(id: string): Promise<void>;
-    getUsersByPage(): string;
     createUser(createUserDto: CreateUserDto): Promise<User>;
 }

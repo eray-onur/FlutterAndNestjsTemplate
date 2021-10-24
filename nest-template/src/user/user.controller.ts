@@ -8,7 +8,7 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get('/getByUsername/:name')
-    async getByUsername(username: string): Promise<User> {
+    async getByUsername(@Param('username') username: string): Promise<User> {
         const user = await this.userService.findOneByUsername(username);
         if(user) {
             return Promise.resolve(user);
@@ -22,16 +22,6 @@ export class UserController {
         const users = await this.userService.findAll();
         console.log(users);
         return Promise.resolve(users);
-    }
-
-    @Get()
-    async getUsersById(@Param('id') id: string) {
-
-    }
-
-    @Get('/getUsersByPage')
-    getUsersByPage() {
-        return 'anan';
     }
 
     @Post('/createUser')
