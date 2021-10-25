@@ -17,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late AuthBloc loginBloc;
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -92,33 +93,47 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      controller: _usernameController,
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                          hintText: "Username"
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        controller: _usernameController,
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if(value == null || value.isEmpty || value.length < 8) {
+                            return 'Please enter a valid username.';
+                          }
+                        },
+                        decoration: InputDecoration(
+                            hintText: "Username"
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                          hintText: "Password"
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: (value) {
+                          if(value == null || value.isEmpty || value.length < 8) {
+                            return 'Password cannot be shorter than 8 characters.';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                            hintText: "Password"
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Positioned(
                 child: Container(
@@ -203,10 +218,12 @@ class _LoginScreenState extends State<LoginScreen> {
     var userName = _usernameController.value.text;
     var password = _passwordController.value.text;
 
-    loginBloc.add(SignInEvent(
-        userName: userName,
-        password: password
-    ));
+    if(_formKey.currentState!.validate()) {
+      loginBloc.add(SignInEvent(
+          userName: userName,
+          password: password
+      ));
+    }
   }
 
   void _authenticate(BuildContext context, AuthState state) {

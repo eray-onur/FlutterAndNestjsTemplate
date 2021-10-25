@@ -22,19 +22,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if(event is SignInEvent) {
       print('Authentication process has been started');
       yield UserAuthenticatingState();
-
       var authorizedUser = await _authRepository
           .login(event.userName, event.password);
 
+
       if (authorizedUser != null) {
-        print('AUTH');
 
         yield UserAuthenticatedState(
             username: authorizedUser.username,
             token: authorizedUser.token
         );
       } else {
-        print('NOT AUTH');
         yield UserFailedToBeAuthenticatedState();
       }
     }
@@ -43,6 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield UserNotAuthenticatedState();
     }
     else if(event is SignUpEvent) {
+      yield UserRegisteringState();
       var registeredUser = await _authRepository
           .register(event.email, event.userName, event.password);
 
@@ -59,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if(foundToken != null) {
         // Validate via found token. Work in progress.
       }
+      else yield UserFailedToRegisterState();
     }
 
   }

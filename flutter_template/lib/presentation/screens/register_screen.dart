@@ -14,14 +14,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  late AuthRepository authRepository;
   late AuthBloc registerBloc;
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  late String userName;
   late String email;
+  late String userName;
   late String password;
 
   @override
@@ -106,43 +106,67 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Stack(
               clipBehavior: Clip.none,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                            hintText: "Email Address"
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+
+                            bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(value!);
+
+                            if(!emailValid) {
+                              return 'Please enter a valid email address.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              hintText: "Email Address"
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextFormField(
-                        textInputAction: TextInputAction.next,
-                        controller: _usernameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                            hintText: "Username"
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextFormField(
+                          textInputAction: TextInputAction.next,
+                          controller: _usernameController,
+                          keyboardType: TextInputType.name,
+                          validator: (value) {
+                            if(value == null || value.isEmpty || value.length < 8) {
+                              return 'Please enter a valid username.';
+                            }
+                          },
+                          decoration: InputDecoration(
+                              hintText: "Username"
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        decoration: InputDecoration(
-                            hintText: "Password"
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: (value) {
+                            if(value == null || value.isEmpty || value.length < 8) {
+                              return 'Password cannot be shorter than 8 characters.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              hintText: "Password"
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Positioned(
                   child: Container(
@@ -216,7 +240,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    print('Login form controllers are being disposed.');
+    print('Register form controllers are being disposed.');
+    _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -226,13 +251,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _startRegistration(BuildContext context) {
     var userName = _usernameController.value.text;
     var password = _passwordController.value.text;
-    registerBloc.add(
-        SignUpEvent (
-        email: email,
-        userName: userName,
-        password: password
-      )
-    );
+    var email = _emailController.value.text;
+
+    if(_formKey.currentState!.validate()) {
+      registerBloc.add(
+          SignUpEvent(
+              email: email,
+              userName: userName,
+              password: password
+          )
+      );
+    }
+
+
   }
 
   void _navigateToLogin(BuildContext context) {

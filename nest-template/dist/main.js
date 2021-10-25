@@ -19,7 +19,7 @@ async function bootstrap() {
         include: [auth_module_1.AuthModule, user_module_1.UserModule]
     });
     swagger_1.SwaggerModule.setup('api', app, authDocument);
-    await app.listen(3000);
+    await app.listen(3000, '127.0.0.1');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

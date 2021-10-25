@@ -23,7 +23,7 @@ async function bootstrap() {
   });
   SwaggerModule.setup('api', app, authDocument);
 
-  await app.listen(3000);
+  await app.listen(3000, '127.0.0.1');
 }
 
 // Commented out because of compatibility issues with Swagger.
