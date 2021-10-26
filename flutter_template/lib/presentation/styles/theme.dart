@@ -11,6 +11,16 @@ ThemeData defaultTheme() {
         primary: Colors.amberAccent,
         secondary: Colors.amber
     ),
+    dialogTheme: DialogTheme(
+      backgroundColor: Colors.white,
+      titleTextStyle: TextStyle(
+        color: Colors.amber
+      ),
+      contentTextStyle: TextStyle(
+        color: Colors.black45
+      )
+    ),
+
     textTheme: TextTheme(
       bodyText1: TextStyle(
           color: Colors.black
@@ -29,5 +39,6 @@ ThemeData defaultTheme() {
 ThemeData darkTheme() {
   return ThemeData.dark().copyWith(
     brightness: Brightness.dark,
+
   );
 }

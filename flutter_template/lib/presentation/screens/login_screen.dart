@@ -227,10 +227,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _authenticate(BuildContext context, AuthState state) {
-    if(state is UserAuthenticatedState) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          HomeScreen.route, (Route<dynamic> route) => false
-      );
+    if(state is UserAuthenticatedState)
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+    else if(state is UserFailedToBeAuthenticatedState) {
+      showDialog(context: context, builder: (BuildContext context) => AlertDialog(
+        title: const Text('Login Failure'),
+        content: Text('Something went wrong. Please try again later.'),
+      ));
     }
   }
 

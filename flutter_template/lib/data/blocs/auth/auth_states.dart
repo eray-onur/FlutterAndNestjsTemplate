@@ -15,7 +15,11 @@ class UserAuthenticatedState extends AuthState {
 }
 
 // When service does not authenticate the user.
-class UserFailedToBeAuthenticatedState extends AuthState {}
+class UserFailedToBeAuthenticatedState extends AuthState {
+  String? reason;
+
+  UserFailedToBeAuthenticatedState({this.reason});
+}
 
 // User did not register yet.
 class UserNotRegisteredState extends AuthState {}
@@ -32,4 +36,8 @@ class UserRegisteredState extends AuthState {
 
 
 // Service failed to create new account for user for any reason.
-class UserFailedToRegisterState extends AuthState {}
+class UserFailedToRegisterState extends AuthState {
+  String? reason;
+
+  UserFailedToRegisterState({this.reason});
+}

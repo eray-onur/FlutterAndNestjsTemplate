@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_template/data/models/dtos/authorized_user.dto.dart';
 import 'package:flutter_template/data/models/dtos/registered_user.dto.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
+import 'package:flutter_template/data/models/results/result.dart';
 import 'package:flutter_template/data/providers/auth_provider.dart';
 import 'package:flutter_template/data/providers/secure_storage_provider.dart';
 
@@ -11,25 +12,31 @@ class AuthRepository {
   AuthProvider _authProvider = AuthProvider();
   SecureStorageProvider _secureStorageProvider = SecureStorageProvider();
 
-  Future<AuthorizedUserDto?> login(String username, String password) async {
-    try {
-      var result = await _authProvider.login(username, password);
+  Future<Result> login(String username, String password) async {
+      var response = await _authProvider.login(username, password);
 
-      if(result is DataResult) {
+      if(response.statusCode != 500) {
 
           var authorizedUserDto = AuthorizedUserDto.fromJson(
-            jsonDecode(result.data)
+            jsonDecode(response.body)
           );
 
-          _secureStorageProvider.tryInsert('username', authorizedUserDto.username);
-          _secureStorageProvider.tryInsert('access_token', authorizedUserDto.token);
+          await _secureStorageProvider.tryInsert('username', authorizedUserDto.username);
+          await _secureStorageProvider.tryInsert('access_token', authorizedUserDto.token);
 
-          return authorizedUserDto;
+
+          return DataResult(
+            data: authorizedUserDto,
+            resultCode: response.statusCode,
+            message: 'Operation successful',
+          );
 
       }
-    } catch (ex) {
-      print(ex);
-    }
+
+      return Result(
+          resultCode: response.statusCode,
+          message: response.body
+      );
   }
 
   Future logout() async {
@@ -42,31 +49,33 @@ class AuthRepository {
     }
   }
 
-  Future<RegisteredUserDto?> register(String email, String username, String password) async {
-    try {
-      var result = await _authProvider.register(email, username, password);
+  Future<Result> register(String email, String username, String password) async {
+    var response = await _authProvider.register(email, username, password);
+    print('STATUS CODE IS:');
+    print(response.statusCode);
+    if(response.statusCode != 500) {
+      var registeredUserDto = RegisteredUserDto.fromJson(
+          jsonDecode(response.body)
+      );
+      await _secureStorageProvider.tryInsert(
+          'username', registeredUserDto.token);
+      await _secureStorageProvider.tryInsert(
+          'access_token', registeredUserDto.token);
 
-      if(result is DataResult) {
-        var registeredUserDto = RegisteredUserDto.fromJson(
-          jsonDecode(result.data)
-        );
-
-        await _secureStorageProvider.tryInsert('username', registeredUserDto.token);
-        await _secureStorageProvider.tryInsert('access_token', registeredUserDto.token);
-
-        return registeredUserDto;
-      }
-    } catch(ex) {
-      print(ex);
-    }
-    return null;
+      return DataResult(
+        resultCode: response.statusCode,
+        message: 'Operation successful',
+        data: registeredUserDto,
+      );
+    } else return Result(
+        resultCode: response.statusCode,
+        message: response.body
+    );
   }
 
   Future<String?> findStoredToken() async {
     return await _secureStorageProvider.getValueByKey("access_token");
   }
 
-  Future validateStoredUser() async {
 
-  }
 }

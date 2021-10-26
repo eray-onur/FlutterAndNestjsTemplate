@@ -11,22 +11,9 @@ import 'package:flutter_template/presentation/screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
+
   static const route = '/home';
-
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-
-class _HomeScreenState extends State<HomeScreen>  {
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +64,8 @@ class _HomeScreenState extends State<HomeScreen>  {
               ),
               ElevatedButton(
                 child: Text('Switch Theme'),
-                onPressed: () async {
-                  print(context.read<ThemeCubit>().toggleTheme());
+                onPressed: () {
+                  context.read<ThemeCubit>().toggleTheme();
                 },
               )
             ],

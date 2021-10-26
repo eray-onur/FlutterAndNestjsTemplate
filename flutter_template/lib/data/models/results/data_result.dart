@@ -1,5 +1,6 @@
 import 'package:flutter_template/data/models/results/result.dart';
 
+// Result returned from generic repositories.
 class DataResult extends Result {
   int resultCode;
   dynamic data;

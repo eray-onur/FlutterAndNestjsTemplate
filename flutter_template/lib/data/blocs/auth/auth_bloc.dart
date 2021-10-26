@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_template/data/blocs/auth/auth_states.dart';
+import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
 import 'auth_events.dart';
@@ -22,41 +24,45 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if(event is SignInEvent) {
       print('Authentication process has been started');
       yield UserAuthenticatingState();
-      var authorizedUser = await _authRepository
+      var result = await _authRepository
           .login(event.userName, event.password);
 
 
-      if (authorizedUser != null) {
+      if (result is DataResult) {
 
         yield UserAuthenticatedState(
-            username: authorizedUser.username,
-            token: authorizedUser.token
+            username: result.data.username,
+            token: result.data.token
         );
       } else {
-        yield UserFailedToBeAuthenticatedState();
+
+        yield UserFailedToBeAuthenticatedState(reason: result.message);
       }
     }
     else if(event is SignOutEvent) {
       await _authRepository.logout();
+      print('SIGNED OUT NOW');
       yield UserNotAuthenticatedState();
     }
     else if(event is SignUpEvent) {
       yield UserRegisteringState();
-      var registeredUser = await _authRepository
+
+      var result = await _authRepository
           .register(event.email, event.userName, event.password);
 
-      print(registeredUser?.username);
-
-      if(registeredUser != null) {
-        yield UserRegisteredState(token: registeredUser.token);
+      if(result is DataResult) {
+        yield UserRegisteredState(token: result.data.token);
       } else {
-        yield UserFailedToRegisterState();
+        yield UserFailedToRegisterState(reason: result.message);
       }
     }
     else if(event is AutoSignInEvent) {
       String? foundToken = await _authRepository.findStoredToken();
       if(foundToken != null) {
         // Validate via found token. Work in progress.
+        print('Token FOUND!');
+        print(foundToken);
+        yield UserAuthenticatedState(username: '', token: foundToken);
       }
       else yield UserFailedToRegisterState();
     }

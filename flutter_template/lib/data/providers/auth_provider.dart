@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_template/data/constants.dart';
@@ -19,10 +20,9 @@ class AuthProvider {
     return Result(resultCode: response.statusCode, message: response.body);
   }
 
-  Future<Result> login(String username, String password) async {
-    late http.Response response;
+  Future<http.Response> login(String username, String password) async {
     try {
-      response = await http.post(
+      http.Response response = await http.post(
           Uri.http(LOCAL_TESTAPI_ENDPOINT, "/auth/login"),
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json',
@@ -31,23 +31,20 @@ class AuthProvider {
             "username": username,
             "password": password
           })
-      );
-      if(response.statusCode < 400)
-        return DataResult(
-            resultCode: response.statusCode,
-            data: response.body, message: 'Returned data'
-        );
-      else throw Exception(response);
-    } catch(err) {
-      print(err);
+      ).timeout(Duration(seconds: 12));
+
+      return Future.value(response);
+
+    } on TimeoutException catch(ex) {
+      print('EXCEPTION');
+      print(ex);
+      return http.Response('Timeout exception', 500);
     }
-    return Result(resultCode: response.statusCode, message: response.body);
   }
 
-  Future<Result> register(String email, String username, String password) async {
-    late http.Response response;
+  Future<http.Response> register(String email, String username, String password) async {
     try {
-      response = await http.post(
+      http.Response response = await http.post(
           Uri.http(LOCAL_TESTAPI_ENDPOINT, "/auth/register"),
           body: jsonEncode({
             "email": email,
@@ -57,18 +54,14 @@ class AuthProvider {
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json'
           }
-      );
-      if(response.statusCode < 400) {
-        return DataResult(
-            resultCode: response.statusCode,
-            data: response.body, message: "Returned new user's info."
-        );
-      }
+      ).timeout(Duration(seconds: 12));
 
-      else throw Exception(response.body);
-    } catch(ex) {
-      print(ex);
+      return Future.value(response);
     }
-    return Result(resultCode: response.statusCode, message: response.body);
+    on TimeoutException catch(ex) {
+      print('EXCEPTION');
+      print(ex);
+      return http.Response('Timeout exception', 500);
+    }
   }
 }

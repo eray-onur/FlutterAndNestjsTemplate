@@ -11,7 +11,7 @@ class ThemeCubit extends Cubit<ThemeData> {
   }
 
   toggleTheme() {
-    
+
     _currentTheme = _currentTheme.brightness == Brightness.light
         ? darkTheme()
         : defaultTheme();

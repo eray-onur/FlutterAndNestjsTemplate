@@ -32,7 +32,11 @@ class SecureStorageProvider {
   }
 
   Future deleteValue(String key) async {
-    return await _storage.delete(key: key);
+    bool hasKey = await _storage.containsKey(key: key);
+    if(hasKey) {
+      return await _storage.delete(key: key);
+    }
+    return null;
   }
 
 }

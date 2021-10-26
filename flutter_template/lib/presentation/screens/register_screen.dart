@@ -40,10 +40,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         create: (context) => AuthBloc(authRepository: context.read<AuthRepository>()),
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if(state is UserRegisteredState) {
+            if(state is UserRegisteredState)
               Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
-              print('Token is: ');
-              print(state.token);
+            else if(state is UserFailedToRegisterState) {
+              showDialog(context: context, builder: (BuildContext context) => AlertDialog(
+                title: const Text('Register Failure'),
+                content: Text('Something went wrong. Please try again later.'),
+              ));
             }
           },
           builder: (context, state) {
