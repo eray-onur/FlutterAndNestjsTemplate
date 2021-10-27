@@ -17,7 +17,6 @@ class AuthRepository {
   Future<Result> login(String username, String password) async {
       var response = await _authProvider.login(username, password);
       var message = jsonDecode(response.body)['message'];
-      print(response.statusCode);
 
       if(response.statusCode == HttpStatus.created) {
         var authorizedUserDto = AuthorizedUserDto.fromJson(
@@ -48,14 +47,12 @@ class AuthRepository {
       _secureStorageProvider.deleteValue('access_token');
     } catch(ex) {
       print('An exception came up during logout.');
-      print(ex);
     }
   }
 
   Future<Result> register(String email, String username, String password) async {
     var response = await _authProvider.register(email, username, password);
     var message = jsonDecode(response.body)['message'];
-    print(response.statusCode);
 
     if(response.statusCode == HttpStatus.created) {
       var registeredUserDto = RegisteredUserDto.fromJson(
@@ -72,7 +69,6 @@ class AuthRepository {
         data: registeredUserDto,
       );
     } else {
-      print(message);
       return Result(
           resultCode: response.statusCode,
           message: message

@@ -32,13 +32,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             token: result.data.token
         );
       } else {
-        print(result.message);
         yield UserFailedToBeAuthenticatedState(reason: result.message);
       }
     }
     else if(event is SignOutEvent) {
       await _authRepository.logout();
-      print('SIGNED OUT NOW');
       yield UserNotAuthenticatedState();
     }
     else if(event is SignUpEvent) {
@@ -50,7 +48,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if(result is DataResult) {
         yield UserRegisteredState(token: result.data.token);
       } else {
-        print(result.message);
         yield UserFailedToRegisterState(reason: result.message);
       }
     }
