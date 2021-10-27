@@ -13,7 +13,18 @@ export class AuthService {
   constructor(private readonly userService: UserService, private jwtService: JwtService) {}
 
   async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
-    try {
+      // Check if this email already registered.
+      let alreadyRegistered = await this.userService.findOneByEmail(createUserDto.email);
+      if(alreadyRegistered)
+        throw new HttpException('User with same email already exists', 403);
+
+      // Check if a user with same username exists.
+      let userWithSameUsername = await this.userService.findOneByUsername(createUserDto.username);
+      if(userWithSameUsername)
+        throw new HttpException('User with the same username already exists', 403);
+      
+      
+      //
       const bcrypt = require('bcrypt');
       const salt = await bcrypt.genSalt(saltRounds);
       const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
@@ -36,45 +47,33 @@ export class AuthService {
         token: token
       };
       return registeredUserDto;
-
-    } catch(err) {
-      console.error(err);
-      return Promise.reject(`Failed to create user. Reason: ${err}`);
-    }
   }
 
   async login(signinUserDto: SigninUserDto): Promise<AuthorizedUserDto> {
-    try {
-      const foundUser = await this.userService.findOneByUsername(
-        signinUserDto.username
-      );
-      if (foundUser) {
-        const bcrypt = require('bcrypt');
-        const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
-        console.log(`${hashedPassword} -- ${foundUser.password}`);
+    const foundUser = await this.userService.findOneByUsername(
+      signinUserDto.username
+    );
+    if (foundUser) {
+      const bcrypt = require('bcrypt');
+      const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
+      console.log(`${hashedPassword} -- ${foundUser.password}`);
 
-        if(hashedPassword !== foundUser.password) {
-          throw new UnauthorizedException(`Invalid password.`);
-        }
-
-        const token = await this.jwtService.signAsync({
-          sub: foundUser._id, 
-          username: foundUser.username
-        });
-        
-        const authorizedUser: AuthorizedUserDto = {
-          username: foundUser.username,
-          token: token
-        };
-
-        return authorizedUser;
-
+      if(hashedPassword !== foundUser.password) {
+        throw new UnauthorizedException(`Invalid password.`);
       }
-      else throw new NotFoundException(`User does not exist in the system.`);
-    } catch (ex) {
-      console.error(ex);
-      return null;
+
+      const token = await this.jwtService.signAsync({
+        sub: foundUser._id, 
+        username: foundUser.username
+      });
+      
+      const authorizedUser: AuthorizedUserDto = {
+        username: foundUser.username,
+        token: token
+      };
+      return authorizedUser;
     }
+    else throw new HttpException('No user with this username exists!', 403);
   }
 
 }

@@ -2,23 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_template/data/constants.dart';
-import 'package:flutter_template/data/models/results/data_result.dart';
-import 'package:flutter_template/data/models/results/result.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider {
-
-  Future<Result> validateToken(String token) async {
-    late http.Response response;
-    try {
-      response = await http.post(
-        Uri.http("10.0.2.2:3000", "/dummy/dummyGet")
-      );
-    } catch(ex) {
-      print(ex.runtimeType);
-    }
-    return Result(resultCode: response.statusCode, message: response.body);
-  }
 
   Future<http.Response> login(String username, String password) async {
     try {
@@ -31,14 +17,12 @@ class AuthProvider {
             "username": username,
             "password": password
           })
-      ).timeout(Duration(seconds: 12));
+      ).timeout(Duration(seconds: MAX_TIMEOUT_DURATION));
 
       return Future.value(response);
 
-    } on TimeoutException catch(ex) {
-      print('EXCEPTION');
-      print(ex);
-      return http.Response('Timeout exception', 500);
+    } on TimeoutException catch(_) {
+      return http.Response(jsonEncode({'message': 'Server does not respond.'}), 408);
     }
   }
 
@@ -54,14 +38,12 @@ class AuthProvider {
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json'
           }
-      ).timeout(Duration(seconds: 12));
+      ).timeout(Duration(seconds: MAX_TIMEOUT_DURATION));
 
       return Future.value(response);
     }
-    on TimeoutException catch(ex) {
-      print('EXCEPTION');
-      print(ex);
-      return http.Response('Timeout exception', 500);
+    on TimeoutException catch(_) {
+      return http.Response(jsonEncode({'message': 'Server does not respond.'}), 408);
     }
   }
 }

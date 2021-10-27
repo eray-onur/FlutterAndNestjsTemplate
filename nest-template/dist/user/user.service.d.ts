@@ -6,6 +6,7 @@ export declare class UserService {
     private readonly userModel;
     constructor(userModel: Model<UserDocument>);
     findOneById(id: string): Promise<User>;
+    findOneByEmail(email: string): Promise<User>;
     findOneByUsername(username: string): Promise<User>;
     findAll(): Promise<Array<User>>;
     addUser(createUserDto: CreateUserDto): Promise<User>;

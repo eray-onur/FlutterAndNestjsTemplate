@@ -5,8 +5,6 @@ import 'package:flutter_template/data/blocs/auth/auth_events.dart';
 import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
-import 'home_screen.dart';
-
 class LoginScreen extends StatefulWidget {
   static const route = '/auth';
   const LoginScreen({Key? key}) : super(key: key);
@@ -206,7 +204,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     print('Login form controllers are being disposed.');
     _usernameController.dispose();
     _passwordController.dispose();
@@ -229,10 +226,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _authenticate(BuildContext context, AuthState state) {
     if(state is UserAuthenticatedState)
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+
     else if(state is UserFailedToBeAuthenticatedState) {
       showDialog(context: context, builder: (BuildContext context) => AlertDialog(
         title: const Text('Login Failure'),
-        content: Text('Something went wrong. Please try again later.'),
+        content: Text(state.reason != null ? 'Error: ${state.reason}' : 'An unknown error occured. Please try again later.'),
       ));
     }
   }

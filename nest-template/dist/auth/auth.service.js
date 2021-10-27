@@ -25,60 +25,54 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(createUserDto) {
-        try {
-            const bcrypt = require('bcrypt');
-            const salt = await bcrypt.genSalt(constants_1.saltRounds);
-            const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-            const newUser = {
-                email: createUserDto.email,
-                username: createUserDto.username,
-                password: hashedPassword,
-                password_salt: salt,
-                created_at: new Date()
-            };
-            const addedUser = await this.userService.addUser(newUser);
-            const token = await this.jwtService.signAsync({
-                sub: addedUser._id,
-                username: addedUser.username
-            });
-            const registeredUserDto = {
-                username: addedUser.username,
-                token: token
-            };
-            return registeredUserDto;
-        }
-        catch (err) {
-            console.error(err);
-            return Promise.reject(`Failed to create user. Reason: ${err}`);
-        }
+        let alreadyRegistered = await this.userService.findOneByEmail(createUserDto.email);
+        if (alreadyRegistered)
+            throw new common_1.HttpException('User with same email already exists', 403);
+        let userWithSameUsername = await this.userService.findOneByUsername(createUserDto.username);
+        if (userWithSameUsername)
+            throw new common_1.HttpException('User with the same username already exists', 403);
+        const bcrypt = require('bcrypt');
+        const salt = await bcrypt.genSalt(constants_1.saltRounds);
+        const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+        const newUser = {
+            email: createUserDto.email,
+            username: createUserDto.username,
+            password: hashedPassword,
+            password_salt: salt,
+            created_at: new Date()
+        };
+        const addedUser = await this.userService.addUser(newUser);
+        const token = await this.jwtService.signAsync({
+            sub: addedUser._id,
+            username: addedUser.username
+        });
+        const registeredUserDto = {
+            username: addedUser.username,
+            token: token
+        };
+        return registeredUserDto;
     }
     async login(signinUserDto) {
-        try {
-            const foundUser = await this.userService.findOneByUsername(signinUserDto.username);
-            if (foundUser) {
-                const bcrypt = require('bcrypt');
-                const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
-                console.log(`${hashedPassword} -- ${foundUser.password}`);
-                if (hashedPassword !== foundUser.password) {
-                    throw new common_1.UnauthorizedException(`Invalid password.`);
-                }
-                const token = await this.jwtService.signAsync({
-                    sub: foundUser._id,
-                    username: foundUser.username
-                });
-                const authorizedUser = {
-                    username: foundUser.username,
-                    token: token
-                };
-                return authorizedUser;
+        const foundUser = await this.userService.findOneByUsername(signinUserDto.username);
+        if (foundUser) {
+            const bcrypt = require('bcrypt');
+            const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
+            console.log(`${hashedPassword} -- ${foundUser.password}`);
+            if (hashedPassword !== foundUser.password) {
+                throw new common_1.UnauthorizedException(`Invalid password.`);
             }
-            else
-                throw new common_1.NotFoundException(`User does not exist in the system.`);
+            const token = await this.jwtService.signAsync({
+                sub: foundUser._id,
+                username: foundUser.username
+            });
+            const authorizedUser = {
+                username: foundUser.username,
+                token: token
+            };
+            return authorizedUser;
         }
-        catch (ex) {
-            console.error(ex);
-            return null;
-        }
+        else
+            throw new common_1.HttpException('No user with this username exists!', 403);
     }
 };
 AuthService = __decorate([

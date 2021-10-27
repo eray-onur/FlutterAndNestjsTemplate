@@ -45,7 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             else if(state is UserFailedToRegisterState) {
               showDialog(context: context, builder: (BuildContext context) => AlertDialog(
                 title: const Text('Register Failure'),
-                content: Text('Something went wrong. Please try again later.'),
+                content: Text(state.reason != null ? 'Error: ${state.reason}' : 'An unknown error occured. Please try again later.'),
               ));
             }
           },
@@ -242,7 +242,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     print('Register form controllers are being disposed.');
     _emailController.dispose();
     _usernameController.dispose();

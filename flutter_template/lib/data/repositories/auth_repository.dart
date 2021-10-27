@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+
 
 import 'package:flutter_template/data/models/dtos/authorized_user.dto.dart';
 import 'package:flutter_template/data/models/dtos/registered_user.dto.dart';
@@ -14,28 +16,29 @@ class AuthRepository {
 
   Future<Result> login(String username, String password) async {
       var response = await _authProvider.login(username, password);
+      var message = jsonDecode(response.body)['message'];
+      print(response.statusCode);
 
-      if(response.statusCode != 500) {
-
-          var authorizedUserDto = AuthorizedUserDto.fromJson(
+      if(response.statusCode == HttpStatus.created) {
+        var authorizedUserDto = AuthorizedUserDto.fromJson(
             jsonDecode(response.body)
-          );
+        );
 
-          await _secureStorageProvider.tryInsert('username', authorizedUserDto.username);
-          await _secureStorageProvider.tryInsert('access_token', authorizedUserDto.token);
+        await _secureStorageProvider.tryInsert('username', authorizedUserDto.username);
+        await _secureStorageProvider.tryInsert('access_token', authorizedUserDto.token);
 
 
-          return DataResult(
-            data: authorizedUserDto,
-            resultCode: response.statusCode,
-            message: 'Operation successful',
-          );
+        return DataResult(
+          data: authorizedUserDto,
+          resultCode: response.statusCode,
+          message: 'Operation successful',
+        );
 
       }
 
       return Result(
           resultCode: response.statusCode,
-          message: response.body
+          message: message
       );
   }
 
@@ -51,9 +54,10 @@ class AuthRepository {
 
   Future<Result> register(String email, String username, String password) async {
     var response = await _authProvider.register(email, username, password);
-    print('STATUS CODE IS:');
+    var message = jsonDecode(response.body)['message'];
     print(response.statusCode);
-    if(response.statusCode != 500) {
+
+    if(response.statusCode == HttpStatus.created) {
       var registeredUserDto = RegisteredUserDto.fromJson(
           jsonDecode(response.body)
       );
@@ -67,10 +71,13 @@ class AuthRepository {
         message: 'Operation successful',
         data: registeredUserDto,
       );
-    } else return Result(
-        resultCode: response.statusCode,
-        message: response.body
-    );
+    } else {
+      print(message);
+      return Result(
+          resultCode: response.statusCode,
+          message: message
+      );
+    }
   }
 
   Future<String?> findStoredToken() async {

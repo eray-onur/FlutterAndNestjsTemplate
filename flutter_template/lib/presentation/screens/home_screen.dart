@@ -8,7 +8,6 @@ import 'package:flutter_template/data/cubits/theme_cubit.dart';
 import 'package:flutter_template/data/providers/base/authorization_client.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 import 'package:flutter_template/presentation/screens/login_screen.dart';
-import 'package:http/http.dart' as http;
 
 
 class HomeScreen extends StatelessWidget {

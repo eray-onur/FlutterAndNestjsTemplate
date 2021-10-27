@@ -24,6 +24,9 @@ let UserService = class UserService {
     async findOneById(id) {
         return await this.userModel.findById(id);
     }
+    async findOneByEmail(email) {
+        return await this.userModel.findOne({ email: email });
+    }
     async findOneByUsername(username) {
         return await this.userModel.findOne({ username: username });
     }

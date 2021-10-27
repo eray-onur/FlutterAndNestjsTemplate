@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
@@ -26,8 +25,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield UserAuthenticatingState();
       var result = await _authRepository
           .login(event.userName, event.password);
-
-
       if (result is DataResult) {
 
         yield UserAuthenticatedState(
@@ -35,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             token: result.data.token
         );
       } else {
-
+        print(result.message);
         yield UserFailedToBeAuthenticatedState(reason: result.message);
       }
     }
@@ -53,6 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if(result is DataResult) {
         yield UserRegisteredState(token: result.data.token);
       } else {
+        print(result.message);
         yield UserFailedToRegisterState(reason: result.message);
       }
     }

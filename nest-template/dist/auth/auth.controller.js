@@ -19,21 +19,31 @@ const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
+const http_exception_filter_1 = require("../common/http-exception.filter");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
     async login(signinUserDto) {
-        return await this.authService.login(signinUserDto);
+        try {
+            return await this.authService.login(signinUserDto);
+        }
+        catch (ex) {
+            console.log(ex);
+            throw new common_1.HttpException(ex.message, ex.status);
+        }
     }
     async register(createUserDto) {
-        const registeredUser = await this.authService.register(createUserDto);
-        console.log(registeredUser);
-        if (registeredUser) {
-            return Promise.resolve(registeredUser);
+        try {
+            const registeredUser = await this.authService.register(createUserDto);
+            if (registeredUser) {
+                return Promise.resolve(registeredUser);
+            }
         }
-        else
-            throw new common_1.HttpException('Failed to register user.', common_1.HttpStatus.BAD_REQUEST);
+        catch (ex) {
+            console.log(ex);
+            throw new common_1.HttpException(ex.message, ex.status);
+        }
     }
 };
 __decorate([
@@ -44,6 +54,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, common_1.HttpCode)(201),
     (0, common_1.Post)('/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
