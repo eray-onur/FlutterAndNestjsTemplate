@@ -59,7 +59,7 @@ export class AuthService {
       console.log(`${hashedPassword} -- ${foundUser.password}`);
 
       if(hashedPassword !== foundUser.password) {
-        throw new UnauthorizedException(`Invalid password.`);
+        throw new HttpException(`Invalid password.`, 401);
       }
 
       const token = await this.jwtService.signAsync({

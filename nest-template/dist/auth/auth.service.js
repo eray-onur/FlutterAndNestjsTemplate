@@ -59,7 +59,7 @@ let AuthService = class AuthService {
             const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
             console.log(`${hashedPassword} -- ${foundUser.password}`);
             if (hashedPassword !== foundUser.password) {
-                throw new common_1.UnauthorizedException(`Invalid password.`);
+                throw new common_1.HttpException(`Invalid password.`, 401);
             }
             const token = await this.jwtService.signAsync({
                 sub: foundUser._id,
