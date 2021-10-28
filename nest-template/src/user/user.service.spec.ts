@@ -4,10 +4,10 @@ import { UserService } from "./user.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./user.schema";
 import { UserModule } from "./user.module";
-import { connString, dbName } from "./../common/constants";
+import { connString, dbName } from "../common/constants";
 import { Model } from "mongoose";
 
-describe('UserController', () => {
+describe('UserService', () => {
     let userController: UserController;
     let userService: UserService;
 
