@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-
-
 import 'package:flutter_template/data/models/dtos/authorized_user.dto.dart';
 import 'package:flutter_template/data/models/dtos/registered_user.dto.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/models/results/result.dart';
 import 'package:flutter_template/data/providers/auth_provider.dart';
 import 'package:flutter_template/data/providers/secure_storage_provider.dart';
+
+import '../constants.dart';
 
 class AuthRepository {
 
@@ -41,13 +41,15 @@ class AuthRepository {
       );
   }
 
-  Future logout() async {
+  Future<Result> logout() async {
     try {
       _secureStorageProvider.deleteValue('username');
       _secureStorageProvider.deleteValue('access_token');
     } catch(ex) {
       print('An exception came up during logout.');
+      return Result(resultCode: FAILED_LOCAL_OPERATION_CODE, message: 'Failed to clean user credentials.');
     }
+    return Result(resultCode: SUCCESSFUL_LOCAL_OPERATION_CODE, message: 'Successfully logged out.');
   }
 
   Future<Result> register(String email, String username, String password) async {

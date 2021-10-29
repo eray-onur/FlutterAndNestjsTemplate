@@ -3,6 +3,7 @@ import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/models/results/data_result.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
 
+import '../../constants.dart';
 import 'auth_events.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -36,8 +37,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     }
     else if(event is SignOutEvent) {
-      await _authRepository.logout();
-      yield UserNotAuthenticatedState();
+      var result = await _authRepository.logout();
+      if(result.resultCode == SUCCESSFUL_LOCAL_OPERATION_CODE) {
+        yield UserNotAuthenticatedState();
+      }
     }
     else if(event is SignUpEvent) {
       yield UserRegisteringState();
@@ -54,9 +57,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     else if(event is AutoSignInEvent) {
       String? foundToken = await _authRepository.findStoredToken();
       if(foundToken != null) {
-        // Validate via found token. Work in progress.
-        print('Token FOUND!');
-        print(foundToken);
         yield UserAuthenticatedState(username: '', token: foundToken);
       }
       else yield UserFailedToRegisterState();

@@ -36,7 +36,6 @@ class SecureStorageProvider {
     if(hasKey) {
       return await _storage.delete(key: key);
     }
-    return null;
   }
 
 }
