@@ -7,73 +7,21 @@ import { UserService } from '../user/user.service';
 import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
 import { saltRounds } from 'src/common/constants';
 import { AuthorizedUserDto } from 'src/user/dtos/authorized-user.dto';
+import { UserRepository } from 'src/user/user.repository';
+import { AuthRepository } from './auth.repository';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private jwtService: JwtService) {}
+  constructor(private readonly authRepository: AuthRepository, private jwtService: JwtService) {}
 
   async register(createUserDto: CreateUserDto): Promise<RegisteredUserDto> {
       // Check if this email already registered.
-      let alreadyRegistered = await this.userService.findOneByEmail(createUserDto.email);
-      if(alreadyRegistered)
-        throw new HttpException('User with same email already exists', 403);
-
-      // Check if a user with same username exists.
-      let userWithSameUsername = await this.userService.findOneByUsername(createUserDto.username);
-      if(userWithSameUsername)
-        throw new HttpException('User with the same username already exists', 403);
       
-      
-      //
-      const bcrypt = require('bcrypt');
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-
-      const newUser: User = {
-        email: createUserDto.email,
-        username: createUserDto.username,
-        password: hashedPassword,
-        password_salt: salt,
-        created_at: new Date()
-      };
-
-      const addedUser = await this.userService.addUser(newUser);
-      const token = await this.jwtService.signAsync({
-        sub: addedUser._id, 
-        username: addedUser.username
-      });
-      const registeredUserDto : RegisteredUserDto = {
-        username: addedUser.username,
-        token: token
-      };
-      return registeredUserDto;
+      return await this.authRepository.register(createUserDto);
   }
 
   async login(signinUserDto: SigninUserDto): Promise<AuthorizedUserDto> {
-    const foundUser = await this.userService.findOneByUsername(
-      signinUserDto.username
-    );
-    if (foundUser) {
-      const bcrypt = require('bcrypt');
-      const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
-      console.log(`${hashedPassword} -- ${foundUser.password}`);
-
-      if(hashedPassword !== foundUser.password) {
-        throw new HttpException(`Invalid password.`, 401);
-      }
-
-      const token = await this.jwtService.signAsync({
-        sub: foundUser._id, 
-        username: foundUser.username
-      });
-      
-      const authorizedUser: AuthorizedUserDto = {
-        username: foundUser.username,
-        token: token
-      };
-      return authorizedUser;
-    }
-    else throw new HttpException('No user with this username exists!', 403);
+    return await this.authRepository.login(signinUserDto);
   }
 
 }

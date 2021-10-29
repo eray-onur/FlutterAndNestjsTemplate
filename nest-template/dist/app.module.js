@@ -12,7 +12,6 @@ const user_module_1 = require("./user/user.module");
 const auth_module_1 = require("./auth/auth.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const constants_1 = require("./common/constants");
-const dummy_module_1 = require("./dummy/dummy.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -21,7 +20,6 @@ AppModule = __decorate([
             mongoose_1.MongooseModule.forRoot(`${constants_1.connString}/${constants_1.dbName}`),
             auth_module_1.AuthModule,
             user_module_1.UserModule,
-            dummy_module_1.DummyModule
         ],
     })
 ], AppModule);

@@ -8,46 +8,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
-const user_schema_1 = require("./user.schema");
+const user_repository_1 = require("./user.repository");
 let UserService = class UserService {
-    constructor(userModel) {
-        this.userModel = userModel;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
     async findOneById(id) {
-        return await this.userModel.findById(id);
+        return await this.userRepository.findOneById(id);
     }
     async findOneByEmail(email) {
-        return await this.userModel.findOne({ email: email });
+        return await this.userRepository.findOneByEmail(email);
     }
     async findOneByUsername(username) {
-        return await this.userModel.findOne({ username: username });
+        return await this.userRepository.findOneByUsername(username);
     }
     async findAll() {
-        return await this.userModel.find().exec();
+        return await this.userRepository.findAll();
     }
     async addUser(createUserDto) {
-        const createdUser = Object.assign(Object.assign({}, createUserDto), { created_at: new Date() });
-        const result = new this.userModel(createdUser);
-        return await result.save();
+        return await this.userRepository.addUser(createUserDto);
     }
     async updateUser(updateUserDto) {
-        const updatedUser = Object.assign(Object.assign({}, updateUserDto), { modified_at: new Date() });
-        const result = new this.userModel(updatedUser);
-        return await result.save();
+        return await this.userRepository.updateUser(updateUserDto);
     }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [user_repository_1.UserRepository])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

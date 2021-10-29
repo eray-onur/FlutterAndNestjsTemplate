@@ -12,6 +12,7 @@ const user_controller_1 = require("./user.controller");
 const user_service_1 = require("./user.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_schema_1 = require("./user.schema");
+const user_repository_1 = require("./user.repository");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
@@ -25,10 +26,11 @@ UserModule = __decorate([
             user_controller_1.UserController
         ],
         providers: [
+            user_repository_1.UserRepository,
             user_service_1.UserService,
         ],
         exports: [
-            user_service_1.UserService,
+            user_repository_1.UserRepository
         ]
     })
 ], UserModule);

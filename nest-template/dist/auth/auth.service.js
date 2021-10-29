@@ -15,69 +15,26 @@ const jwt_1 = require("@nestjs/jwt");
 const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const user_schema_1 = require("../user/user.schema");
-const user_service_1 = require("../user/user.service");
 const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const constants_1 = require("../common/constants");
 const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
+const user_repository_1 = require("../user/user.repository");
+const auth_repository_1 = require("./auth.repository");
 let AuthService = class AuthService {
-    constructor(userService, jwtService) {
-        this.userService = userService;
+    constructor(authRepository, jwtService) {
+        this.authRepository = authRepository;
         this.jwtService = jwtService;
     }
     async register(createUserDto) {
-        let alreadyRegistered = await this.userService.findOneByEmail(createUserDto.email);
-        if (alreadyRegistered)
-            throw new common_1.HttpException('User with same email already exists', 403);
-        let userWithSameUsername = await this.userService.findOneByUsername(createUserDto.username);
-        if (userWithSameUsername)
-            throw new common_1.HttpException('User with the same username already exists', 403);
-        const bcrypt = require('bcrypt');
-        const salt = await bcrypt.genSalt(constants_1.saltRounds);
-        const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-        const newUser = {
-            email: createUserDto.email,
-            username: createUserDto.username,
-            password: hashedPassword,
-            password_salt: salt,
-            created_at: new Date()
-        };
-        const addedUser = await this.userService.addUser(newUser);
-        const token = await this.jwtService.signAsync({
-            sub: addedUser._id,
-            username: addedUser.username
-        });
-        const registeredUserDto = {
-            username: addedUser.username,
-            token: token
-        };
-        return registeredUserDto;
+        return await this.authRepository.register(createUserDto);
     }
     async login(signinUserDto) {
-        const foundUser = await this.userService.findOneByUsername(signinUserDto.username);
-        if (foundUser) {
-            const bcrypt = require('bcrypt');
-            const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
-            console.log(`${hashedPassword} -- ${foundUser.password}`);
-            if (hashedPassword !== foundUser.password) {
-                throw new common_1.HttpException(`Invalid password.`, 401);
-            }
-            const token = await this.jwtService.signAsync({
-                sub: foundUser._id,
-                username: foundUser.username
-            });
-            const authorizedUser = {
-                username: foundUser.username,
-                token: token
-            };
-            return authorizedUser;
-        }
-        else
-            throw new common_1.HttpException('No user with this username exists!', 403);
+        return await this.authRepository.login(signinUserDto);
     }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_service_1.UserService, jwt_1.JwtService])
+    __metadata("design:paramtypes", [auth_repository_1.AuthRepository, jwt_1.JwtService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map
