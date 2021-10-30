@@ -20,7 +20,6 @@ export class UserController {
     @Get('/getAll')
     async getAll(): Promise<Array<User>> {
         const users = await this.userService.findAll();
-        console.log(users);
         return Promise.resolve(users);
     }
 

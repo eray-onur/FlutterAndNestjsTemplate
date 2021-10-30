@@ -1,4 +1,3 @@
-import * as mongoose from 'mongoose';
 import { Document } from "mongoose";
 export declare type UserDocument = User & Document;
 export declare class User {
@@ -10,4 +9,4 @@ export declare class User {
     created_at: Date;
     modified_at?: Date;
 }
-export declare const UserSchema: mongoose.Schema<mongoose.Document<User, any, any>, mongoose.Model<mongoose.Document<User, any, any>, any, any>, {}>;
+export declare const UserSchema: import("mongoose").Schema<Document<User, any, any>, import("mongoose").Model<Document<User, any, any>, any, any>, {}>;

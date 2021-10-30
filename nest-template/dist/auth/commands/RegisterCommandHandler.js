@@ -1,0 +1,1 @@
+//# sourceMappingURL=RegisterCommandHandler.js.map

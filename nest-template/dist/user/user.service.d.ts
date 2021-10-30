@@ -1,10 +1,11 @@
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
-import { UserRepository } from "./user.repository";
 import { User } from './user.schema';
 export declare class UserService {
-    private readonly userRepository;
-    constructor(userRepository: UserRepository);
+    private readonly commandBus;
+    private readonly queryBus;
+    constructor(commandBus: CommandBus, queryBus: QueryBus);
     findOneById(id: string): Promise<User>;
     findOneByEmail(email: string): Promise<User>;
     findOneByUsername(username: string): Promise<User>;

@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
+const cqrs_1 = require("@nestjs/cqrs");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const user_module_1 = require("../user/user.module");
@@ -15,6 +16,7 @@ const auth_constants_1 = require("./auth.constants");
 const auth_controller_1 = require("./auth.controller");
 const auth_repository_1 = require("./auth.repository");
 const auth_service_1 = require("./auth.service");
+const handlers_1 = require("./commands/handlers");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const local_strategy_1 = require("./strategies/local.strategy");
 let AuthModule = class AuthModule {
@@ -22,6 +24,7 @@ let AuthModule = class AuthModule {
 AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            cqrs_1.CqrsModule,
             user_module_1.UserModule,
             passport_1.PassportModule,
             jwt_1.JwtModule.register({
@@ -31,6 +34,7 @@ AuthModule = __decorate([
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [
+            ...handlers_1.CommandHandlers,
             auth_service_1.AuthService,
             auth_repository_1.AuthRepository,
             local_strategy_1.LocalStrategy,

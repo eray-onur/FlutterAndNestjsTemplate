@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("@nestjs/jwt");
 const create_user_dto_1 = require("../user/dtos/create-user.dto");
 const signin_user_dto_1 = require("../user/dtos/signin-user.dto");
 const user_schema_1 = require("../user/user.schema");
@@ -19,22 +18,25 @@ const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const constants_1 = require("../common/constants");
 const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
 const user_repository_1 = require("../user/user.repository");
-const auth_repository_1 = require("./auth.repository");
+const cqrs_1 = require("@nestjs/cqrs");
+const register_command_1 = require("./commands/register.command");
+const login_command_1 = require("./commands/login.command");
 let AuthService = class AuthService {
-    constructor(authRepository, jwtService) {
-        this.authRepository = authRepository;
-        this.jwtService = jwtService;
+    constructor(commandBus) {
+        this.commandBus = commandBus;
     }
     async register(createUserDto) {
-        return await this.authRepository.register(createUserDto);
+        const commandResult = await this.commandBus.execute(new register_command_1.RegisterCommand(createUserDto.email, createUserDto.username, createUserDto.password));
+        return commandResult;
     }
     async login(signinUserDto) {
-        return await this.authRepository.login(signinUserDto);
+        const commandResult = await this.commandBus.execute(new login_command_1.LoginCommand(signinUserDto.username, signinUserDto.password));
+        return commandResult;
     }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [auth_repository_1.AuthRepository, jwt_1.JwtService])
+    __metadata("design:paramtypes", [cqrs_1.CommandBus])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

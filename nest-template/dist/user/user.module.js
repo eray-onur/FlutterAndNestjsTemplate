@@ -13,11 +13,15 @@ const user_service_1 = require("./user.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_schema_1 = require("./user.schema");
 const user_repository_1 = require("./user.repository");
+const cqrs_1 = require("@nestjs/cqrs");
+const handlers_1 = require("./commands/handlers");
+const handlers_2 = require("./queries/handlers");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            cqrs_1.CqrsModule,
             mongoose_1.MongooseModule.forFeature([{
                     name: user_schema_1.User.name, schema: user_schema_1.UserSchema
                 }])
@@ -26,6 +30,8 @@ UserModule = __decorate([
             user_controller_1.UserController
         ],
         providers: [
+            ...handlers_1.CommandHandlers,
+            ...handlers_2.QueryHandlers,
             user_repository_1.UserRepository,
             user_service_1.UserService,
         ],

@@ -30,7 +30,6 @@ let UserController = class UserController {
     }
     async getAll() {
         const users = await this.userService.findAll();
-        console.log(users);
         return Promise.resolve(users);
     }
     async createUser(createUserDto) {

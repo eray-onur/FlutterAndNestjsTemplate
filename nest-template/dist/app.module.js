@@ -21,6 +21,7 @@ AppModule = __decorate([
             auth_module_1.AuthModule,
             user_module_1.UserModule,
         ],
+        providers: []
     })
 ], AppModule);
 exports.AppModule = AppModule;
