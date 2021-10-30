@@ -1,4 +1,3 @@
-import { AggregateRoot } from "@nestjs/cqrs";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -7,17 +6,23 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
     _id?: string;
-    @Prop()
+    
+    @Prop({type: String, match: /^.+?@.+?$/, required: true})
     email: string;
-    @Prop()
+
+    @Prop({type: String, required: true})
     username: string;
-    @Prop()
+
+    @Prop({type: String, required: true})
     password: string;
-    @Prop()
+
+    @Prop({type: String, required: true})
     password_salt: string;
-    @Prop()
+
+    @Prop({type: Date})
     created_at: Date;
-    @Prop()
+
+    @Prop({type: Date})
     modified_at?: Date;
 }
 

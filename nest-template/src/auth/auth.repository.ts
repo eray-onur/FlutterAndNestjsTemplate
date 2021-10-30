@@ -1,13 +1,16 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { SigninUserDto } from 'src/user/dtos/signin-user.dto';
 import { User } from 'src/user/user.schema';
-import { UserService } from '../user/user.service';
 import { RegisteredUserDto } from 'src/user/dtos/registered-user.dto';
 import { saltRounds } from 'src/common/constants';
 import { AuthorizedUserDto } from 'src/user/dtos/authorized-user.dto';
 import { UserRepository } from 'src/user/user.repository';
+import { InvalidCredentialsException } from '../common/entities/custom-exceptions/invalid-credentials.exception';
+import { NonexistentUserException } from '../common/entities/custom-exceptions/nonexistent-user.exception';
+import { UsernameTakenException } from '../common/entities/custom-exceptions/username-taken.exception';
+import { EmailTakenException } from '../common/entities/custom-exceptions/email-taken.exception';
 
 @Injectable()
 export class AuthRepository {
@@ -17,12 +20,12 @@ export class AuthRepository {
       // Check if this email already registered.
       let alreadyRegistered = await this.userRepository.findOneByEmail(createUserDto.email);
       if(alreadyRegistered)
-        throw new HttpException('User with same email already exists', 403);
+        throw new EmailTakenException();
 
       // Check if a user with same username exists.
       let userWithSameUsername = await this.userRepository.findOneByUsername(createUserDto.username);
       if(userWithSameUsername)
-        throw new HttpException('User with the same username already exists', 403);
+        throw new UsernameTakenException();
       
       
       //
@@ -60,7 +63,7 @@ export class AuthRepository {
       console.log(`${hashedPassword} -- ${foundUser.password}`);
 
       if(hashedPassword !== foundUser.password) {
-        throw new HttpException(`Invalid password.`, 401);
+        throw new InvalidCredentialsException();
       }
 
       const token = await this.jwtService.signAsync({
@@ -74,7 +77,7 @@ export class AuthRepository {
       };
       return authorizedUser;
     }
-    else throw new HttpException('No user with this username exists!', 403);
+    else throw new NonexistentUserException();
   }
 
 }

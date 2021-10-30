@@ -7,4 +7,3 @@ export class RegisterCommand implements ICommand {
         public readonly password: string
     ) {}
 }
-

@@ -19,6 +19,10 @@ const registered_user_dto_1 = require("../user/dtos/registered-user.dto");
 const constants_1 = require("../common/constants");
 const authorized_user_dto_1 = require("../user/dtos/authorized-user.dto");
 const user_repository_1 = require("../user/user.repository");
+const invalid_credentials_exception_1 = require("../common/entities/custom-exceptions/invalid-credentials.exception");
+const nonexistent_user_exception_1 = require("../common/entities/custom-exceptions/nonexistent-user.exception");
+const username_taken_exception_1 = require("../common/entities/custom-exceptions/username-taken.exception");
+const email_taken_exception_1 = require("../common/entities/custom-exceptions/email-taken.exception");
 let AuthRepository = class AuthRepository {
     constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
@@ -27,10 +31,10 @@ let AuthRepository = class AuthRepository {
     async register(createUserDto) {
         let alreadyRegistered = await this.userRepository.findOneByEmail(createUserDto.email);
         if (alreadyRegistered)
-            throw new common_1.HttpException('User with same email already exists', 403);
+            throw new email_taken_exception_1.EmailTakenException();
         let userWithSameUsername = await this.userRepository.findOneByUsername(createUserDto.username);
         if (userWithSameUsername)
-            throw new common_1.HttpException('User with the same username already exists', 403);
+            throw new username_taken_exception_1.UsernameTakenException();
         const bcrypt = require('bcrypt');
         const salt = await bcrypt.genSalt(constants_1.saltRounds);
         const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
@@ -59,7 +63,7 @@ let AuthRepository = class AuthRepository {
             const hashedPassword = await bcrypt.hash(signinUserDto.password, foundUser.password_salt);
             console.log(`${hashedPassword} -- ${foundUser.password}`);
             if (hashedPassword !== foundUser.password) {
-                throw new common_1.HttpException(`Invalid password.`, 401);
+                throw new invalid_credentials_exception_1.InvalidCredentialsException();
             }
             const token = await this.jwtService.signAsync({
                 sub: foundUser._id,
@@ -72,7 +76,7 @@ let AuthRepository = class AuthRepository {
             return authorizedUser;
         }
         else
-            throw new common_1.HttpException('No user with this username exists!', 403);
+            throw new nonexistent_user_exception_1.NonexistentUserException();
     }
 };
 AuthRepository = __decorate([

@@ -4,6 +4,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./user.schema";
 import { closeInMongodConnection, rootMongooseTestModule } from '../common/test-utils/mongo-inmemory.db';
 import { CreateUserDto } from "./dtos/create-user.dto";
+import { CqrsModule } from "@nestjs/cqrs";
+import { CommandHandlers } from "./commands/handlers";
+import { QueryHandlers } from "./queries/handlers";
 
 describe('UserService', () => {
     let userService: UserService;
@@ -15,6 +18,9 @@ describe('UserService', () => {
                 MongooseModule.forFeature([{
                     name: User.name, schema: UserSchema
                 }]),
+                CqrsModule,
+                ...CommandHandlers,
+                ...QueryHandlers
             ],
             providers: [
                 UserService
