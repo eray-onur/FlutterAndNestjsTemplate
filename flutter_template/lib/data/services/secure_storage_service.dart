@@ -1,13 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SecureStorageProvider {
+class SecureStorageService {
 
-  late FlutterSecureStorage _storage;
-
-  SecureStorageProvider() {
-    _storage = FlutterSecureStorage();
-  }
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   Future<Map<String, String>> getValues() async {
     return await _storage.readAll();

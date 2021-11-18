@@ -5,8 +5,8 @@ import 'package:flutter_template/data/blocs/auth/auth_events.dart';
 import 'package:flutter_template/data/blocs/auth/auth_states.dart';
 import 'package:flutter_template/data/constants.dart';
 import 'package:flutter_template/data/cubits/theme_cubit.dart';
-import 'package:flutter_template/data/providers/base/authorization_client.dart';
 import 'package:flutter_template/data/repositories/auth_repository.dart';
+import 'package:flutter_template/data/services/base/authorization_client.dart';
 import 'package:flutter_template/presentation/screens/login_screen.dart';
 
 

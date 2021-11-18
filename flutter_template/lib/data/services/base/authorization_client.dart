@@ -1,9 +1,10 @@
-import 'package:flutter_template/data/providers/secure_storage_provider.dart';
 import 'package:http/http.dart' as http;
+
+import '../secure_storage_service.dart';
 
 class AuthorizationClient extends http.BaseClient {
 
-  var secureStorageProvider = SecureStorageProvider();
+  var secureStorageProvider = SecureStorageService();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {

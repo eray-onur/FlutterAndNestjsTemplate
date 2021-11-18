@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter_template/data/constants.dart';
 import 'package:http/http.dart' as http;
 
-class AuthProvider {
+class AuthService {
 
   Future<http.Response> login(String username, String password) async {
     try {
